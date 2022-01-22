@@ -1,7 +1,0 @@
-unit Services.ADB.Win;
-
-interface
-
-implementation
-
-end.
