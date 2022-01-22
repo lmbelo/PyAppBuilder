@@ -1,0 +1,7 @@
+unit Storage.Default;
+
+interface
+
+implementation
+
+end.

@@ -1,0 +1,184 @@
+inherited ProjectForm: TProjectForm
+  Caption = 'Project'
+  ClientHeight = 488
+  ClientWidth = 406
+  DesignerMasterStyle = 0
+  inherited lnHeaderSeparator: TLine
+    Size.Width = 406.000000000000000000
+  end
+  inherited loBody: TLayout
+    Size.Width = 406.000000000000000000
+    Size.Height = 386.000000000000000000
+    inherited lbProject: TListBox
+      Size.Width = 406.000000000000000000
+      Size.Height = 386.000000000000000000
+      Viewport.Width = 402.000000000000000000
+      Viewport.Height = 382.000000000000000000
+      object ListBoxGroupHeader1: TListBoxGroupHeader
+        TextSettings.Font.Size = 13.000000000000000000
+        StyledSettings = [Family, Style, Other]
+        Size.Width = 402.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'listboxplainheader'
+        TabOrder = 0
+        Text = 'Package Settings'
+      end
+      object ListBoxItem1: TListBoxItem
+        Position.Y = 24.000000000000000000
+        Size.Width = 402.000000000000000000
+        Size.Height = 38.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 5
+        object edtPackageName: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Align = Client
+          StyleLookup = 'editstyle'
+          TabOrder = 40
+          Margins.Left = 5.000000000000000000
+          Margins.Top = 5.000000000000000000
+          Margins.Right = 5.000000000000000000
+          Margins.Bottom = 5.000000000000000000
+          Size.Width = 392.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'com.embarcadero.PyApp'
+        end
+      end
+      object ListBoxGroupHeader2: TListBoxGroupHeader
+        TextSettings.Font.Size = 13.000000000000000000
+        StyledSettings = [Family, Style, FontColor, Other]
+        Position.Y = 62.000000000000000000
+        Size.Width = 402.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 7
+        Text = 'Version Info:'
+      end
+      object ListBoxItem2: TListBoxItem
+        Position.Y = 86.000000000000000000
+        Size.Width = 402.000000000000000000
+        Size.Height = 38.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 4
+        object edtVersionCode: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Align = Client
+          StyleLookup = 'editstyle'
+          TabOrder = 40
+          Margins.Left = 5.000000000000000000
+          Margins.Top = 5.000000000000000000
+          Margins.Right = 5.000000000000000000
+          Margins.Bottom = 5.000000000000000000
+          Size.Width = 392.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'Version code: 1'
+        end
+      end
+      object ListBoxItem3: TListBoxItem
+        Position.Y = 124.000000000000000000
+        Size.Width = 402.000000000000000000
+        Size.Height = 38.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        object edtVersionName: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Align = Client
+          StyleLookup = 'editstyle'
+          TabOrder = 40
+          Margins.Left = 5.000000000000000000
+          Margins.Top = 5.000000000000000000
+          Margins.Right = 5.000000000000000000
+          Margins.Bottom = 5.000000000000000000
+          Size.Width = 392.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'Version name: 1.0.0'
+        end
+      end
+      object ListBoxGroupHeader3: TListBoxGroupHeader
+        TextSettings.Font.Size = 13.000000000000000000
+        StyledSettings = [Family, Style, FontColor, Other]
+        Position.Y = 162.000000000000000000
+        Size.Width = 402.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 6
+        Text = 'Python Settings:'
+      end
+      object ListBoxItem4: TListBoxItem
+        Position.Y = 186.000000000000000000
+        Size.Width = 402.000000000000000000
+        Size.Height = 38.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object cbPythonVersion: TComboBox
+          Align = Client
+          Items.Strings = (
+            '3.8'
+            '3.9'
+            '3.10')
+          ItemIndex = 1
+          Margins.Left = 5.000000000000000000
+          Margins.Top = 5.000000000000000000
+          Margins.Right = 5.000000000000000000
+          Margins.Bottom = 5.000000000000000000
+          Size.Width = 392.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 64
+        end
+      end
+      object ListBoxGroupHeader4: TListBoxGroupHeader
+        Position.Y = 224.000000000000000000
+        TabOrder = 8
+        Text = 'App Architecture:'
+      end
+      object ListBoxItem5: TListBoxItem
+        Position.Y = 243.000000000000000000
+        Size.Width = 402.000000000000000000
+        Size.Height = 38.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object cbArchitecture: TComboBox
+          Align = Client
+          Items.Strings = (
+            'arm'
+            'aarch64')
+          ItemIndex = 1
+          Margins.Left = 5.000000000000000000
+          Margins.Top = 5.000000000000000000
+          Margins.Right = 5.000000000000000000
+          Margins.Bottom = 5.000000000000000000
+          Size.Width = 392.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 64
+        end
+      end
+    end
+  end
+  inherited loFooter: TLayout
+    Position.Y = 438.000000000000000000
+    Size.Width = 406.000000000000000000
+  end
+  inherited loHeader: TLayout
+    Size.Width = 406.000000000000000000
+    inherited lblProject: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Project'
+    end
+    inherited imgHeader: TGlyph
+      ImageIndex = 1
+    end
+  end
+  inherited actBase: TActionList
+    inherited actSave: TAction
+      ImageIndex = 3
+    end
+    inherited actCancel: TAction
+      ImageIndex = 4
+    end
+  end
+end

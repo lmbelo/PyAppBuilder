@@ -1,0 +1,47 @@
+unit Storage.Default;
+
+interface
+
+uses
+  Storage;
+
+type
+  TDefaultStorage<Model: Class> = class(TInterfacedObject, IStorage<Model>)
+  private
+    class var FDefaultStorage: TDefaultStorage<Model>;
+  private
+     FJsonStorage: IStorage<Model>;
+  protected
+    constructor Create();
+    destructor Destroy(); override;
+  public
+    property Storage: IStorage<Model> read FJsonStorage implements IStorage<Model>;
+  end;
+
+implementation
+
+uses
+  Storage.Json;
+
+{ TDefaultStorage }
+
+
+{ TDefaultStorage<Model> }
+
+constructor TDefaultStorage<Model>.Create;
+begin
+  FJsonStorage := TJsonStorage<Model>.Create();
+end;
+
+destructor TDefaultStorage<Model>.Destroy;
+begin
+  inherited;
+end;
+
+initialization
+  TDefaultStorage.FDefaultStorage := TDefaultStorage.Create();
+
+finalization
+  TDefaultStorage.FDefaultStorage.Free();
+
+end.

@@ -1,0 +1,35 @@
+unit Storage.Default;
+
+interface
+
+type
+  TDefaultStorage = class
+  private
+    class var FDefaultStorage: TDefaultStorage;
+  protected
+    constructor Create();
+    destructor Destroy(); override;
+  end;
+
+implementation
+
+{ TDefaultStorage }
+
+constructor TDefaultStorage.Create;
+begin
+
+end;
+
+destructor TDefaultStorage.Destroy;
+begin
+
+  inherited;
+end;
+
+initialization
+  TDefaultStorage.FDefaultStorage := TDefaultStorage.Create();
+
+finalization
+  TDefaultStorage.FDefaultStorage.Free();
+
+end.

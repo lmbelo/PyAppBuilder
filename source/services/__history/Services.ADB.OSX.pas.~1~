@@ -1,0 +1,7 @@
+unit Services.ADB.OSX;
+
+interface
+
+implementation
+
+end.

@@ -1,0 +1,17 @@
+unit IDEServices;
+
+interface
+
+type
+  IServices = interface
+    ['{0959ED55-8FA5-4D88-88BB-EB2738261A23}']
+  end;
+
+  ILogServices = interface
+    ['{50EDF1E4-BABC-42BD-A93D-957C53ED9663}']
+    procedure Log(const AString: string);
+  end;
+
+implementation
+
+end.

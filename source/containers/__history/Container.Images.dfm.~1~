@@ -1,0 +1,11 @@
+object DataModule1: TDataModule1
+  Height = 480
+  Width = 640
+  PixelsPerInch = 96
+  object im50x50: TImageList
+    Source = <>
+    Destination = <>
+    Left = 320
+    Top = 184
+  end
+end

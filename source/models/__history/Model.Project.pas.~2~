@@ -1,0 +1,19 @@
+unit Model.Project;
+
+interface
+
+type
+  TProjectModel = class
+  private
+    FPackageName: string;
+    FVersionCode: integer;
+    FVersionName: string;
+  public
+    property PackageName: string read FPackageName write FPackageName;
+    property VersionCode: integer read FVersionCode write FVersionCode;
+    property VersionName: string read FVersionName write FVersionName;
+  end;
+
+implementation
+
+end.

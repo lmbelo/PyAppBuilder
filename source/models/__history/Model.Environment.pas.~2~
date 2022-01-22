@@ -1,0 +1,19 @@
+unit Model.Environment;
+
+interface
+
+type
+  TEnvironmentModel = class
+  private
+    FSdkBasePath: string;
+    FApkSignerLocation: string;
+    FAdbLocation: string;
+  public
+    property SdkBasePath: string read FSdkBasePath write FSdkBasePath;
+    property ApkSignerLocation: string read FApkSignerLocation write FApkSignerLocation;
+    property AdbLocation: string read FAdbLocation write FAdbLocation;
+  end;
+
+implementation
+
+end.
