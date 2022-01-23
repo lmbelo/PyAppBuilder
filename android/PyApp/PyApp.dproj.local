@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2022/01/18 05:13:57.000.268,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PyLoad.dproj=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PyFun.dproj</Transaction>
+    <Transaction>2022/01/18 07:57:25.000.257,=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\Unit1.pas</Transaction>
+    <Transaction>2022/01/18 07:58:04.000.757,=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\Unit1.pas</Transaction>
+    <Transaction>2022/01/18 08:03:27.000.034,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipInstall.fmx=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\Unit1.fmx</Transaction>
+    <Transaction>2022/01/18 08:03:27.000.034,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipInstall.pas=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\Unit1.pas</Transaction>
+    <Transaction>2022/01/18 08:13:01.000.882,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipInstallFrame.pas=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipInstall.pas</Transaction>
+    <Transaction>2022/01/18 08:13:01.000.882,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipInstallFrame.fmx=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipInstall.fmx</Transaction>
+    <Transaction>2022/01/18 11:06:35.000.122,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipFrame.fmx=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipInstallFrame.fmx</Transaction>
+    <Transaction>2022/01/18 11:06:35.000.122,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipFrame.pas=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\python4delphi\Demos\FMX\Android\PyFun\PipInstallFrame.pas</Transaction>
+    <Transaction>2022/01/19 04:35:46.000.431,=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\PyFun\Unit1.pas</Transaction>
+    <Transaction>2022/01/19 04:35:53.000.634,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\PyFun\Unit1.pas=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\PyFun\Android.Os.pas</Transaction>
+    <Transaction>2022/01/19 04:36:11.000.696,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\PyFun\Android.Os.pas=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\PyFun\Android.System.Os.pas</Transaction>
+    <Transaction>2022/01/23 06:04:55.286,C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\PyAppBuilder\android\PyApp\PyApp.dproj=C:\Users\lucas\OneDrive\Documents\Embarcadero\Studio\Projects\PyAppBuilder\android\PyApp\PyFun.dproj</Transaction>
+  </Transactions>
+	<BT_BuildType>Debug</BT_BuildType>
+	<ActiveMobileDevice>
+		<NoProfile Android64="0065996947" Android="0065996947"/>
+	</ActiveMobileDevice>
+</BorlandProject>
