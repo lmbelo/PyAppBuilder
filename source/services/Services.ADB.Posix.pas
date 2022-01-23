@@ -5,12 +5,12 @@ interface
 uses
   System.Classes;
 
-procedure ExecCmdine(const CmdLine: string; CmdResult: TStrings);
+procedure ExecCmdine(const CmdLine, ABaseDir: string; CmdResult: TStrings);
 
 implementation
 
 uses
-  Posix.SysMMan;
+  Posix.SysMMan, System.SysUtils;
 
 const
   libc = '/usr/lib/libc.dylib';
@@ -37,40 +37,49 @@ function fread(Ptr: Pointer; Size: LongWord; N: LongWord;
 function wait(__stat_loc: PInteger): Integer; cdecl;
   external libc name '_wait';
 
-procedure ExecCmdine(const CmdLine: string; CmdResult: TStrings);
+procedure ExecCmdine(const CmdLine, ABaseDir: string; CmdResult: TStrings);
 var
   Output: PIOFile;
   Buffer: PAnsiChar;
-  TempString: Ansistring;
-  Line: AnsiString;
+  TempString: string;
+  Line: string;
   BytesRead: Integer;
 const
   BufferSize: Integer = 1000;
 begin
   TempString := '';
-  Output := popen(PAnsiChar(Ansistring(CmdLine)), 'r');
-  GetMem(Buffer, BufferSize);
-  if Assigned(Output) then
+
+  var LCurDir := GetCurrentDir();
   try
-    while feof(Output) = 0 do
-    begin
-      BytesRead := fread(Buffer, 1, BufferSize, Output);
-      SetLength(TempString, Length(TempString) + BytesRead);
-      Move(Buffer^, TempString[length(TempString) - (BytesRead - 1)], BytesRead);
+    if not ABaseDir.IsEmpty() then
+      SetCurrentDir(ABaseDir);
 
-      while Pos(#10, TempString) > 0 do
+    Output := popen(PAnsiChar(Ansistring(CmdLine)), 'r');
+    GetMem(Buffer, BufferSize);
+    if Assigned(Output) then
+    try
+      while feof(Output) = 0 do
       begin
-        Line := Copy(TempString, 1, Pos(#10, TempString) - 1);
-        if CmdResult <> nil then
-          CmdResult.Add(UTF8ToString(Line));
+        BytesRead := fread(Buffer, 1, BufferSize, Output);
+        SetLength(TempString, Length(TempString) + BytesRead);
+        Move(Buffer^, TempString[length(TempString) - (BytesRead - 1)], BytesRead);
 
-        TempString := Copy(TempString, Pos(#10, TempString) + 1, Length(TempString));
+        while Pos(#10, TempString) > 0 do
+        begin
+          Line := Copy(TempString, 1, Pos(#10, TempString) - 1);
+          if CmdResult <> nil then
+            CmdResult.Add(UTF8ToString(Line));
+
+          TempString := Copy(TempString, Pos(#10, TempString) + 1, Length(TempString));
+        end;
       end;
+    finally
+      pclose(output);
+      wait(nil);
+      FreeMem(Buffer, BufferSize);
     end;
   finally
-    pclose(output);
-    wait(nil);
-    FreeMem(Buffer, BufferSize);
+    SetCurrentDir(LCurDir);
   end;
 end;
 
