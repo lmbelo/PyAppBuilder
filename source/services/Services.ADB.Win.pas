@@ -3,33 +3,33 @@ unit Services.ADB.Win;
 interface
 
 uses
-  System.Classes;
+  System.Classes, FMX.Forms;
 
-procedure ExecCmdine(const CmdLine: string; CmdResult: TStrings);
+procedure ExecCmdine(const CmdLine, ABaseDir: string; CmdResult: TStrings);
 
 implementation
 
 uses
-  Winapi.Windows, FMX.Forms;
+  Winapi.Windows, System.SysUtils;
 
-procedure ExecCmdine(const CmdLine: string; CmdResult: TStrings);
+procedure ExecCmdine(const CmdLine, ABaseDir: string; CmdResult: TStrings);
 const
-    READ_BUFFER_SIZE = 2400;
+  READ_BUFFER_SIZE = 2400;
 var
-    Security: TSecurityAttributes;
-    readableEndOfPipe, writeableEndOfPipe: THandle;
-    start: TStartUpInfo;
-    ProcessInfo: TProcessInformation;
-    Buffer: PAnsiChar;
-    BytesRead: DWORD;
-    AppRunning: DWORD;
+  Security: TSecurityAttributes;
+  readableEndOfPipe, writeableEndOfPipe: THandle;
+  start: TStartUpInfo;
+  ProcessInfo: TProcessInformation;
+  Buffer: PAnsiChar;
+  BytesRead: DWORD;
+  AppRunning: DWORD;
+  dwBytesAvailable: integer;
 begin
   Security.nLength := SizeOf(TSecurityAttributes);
   Security.bInheritHandle := True;
   Security.lpSecurityDescriptor := nil;
 
-  if CreatePipe({var}readableEndOfPipe, {var}writeableEndOfPipe, @Security, 0) then
-  begin
+  if CreatePipe(readableEndOfPipe, writeableEndOfPipe, @Security, 0) then begin
     Buffer := AllocMem(READ_BUFFER_SIZE+1);
     FillChar(Start, Sizeof(Start), #0);
     start.cb := SizeOf(start);
@@ -45,10 +45,13 @@ begin
     ProcessInfo := Default(TProcessInformation);
 
     var LCmd := CmdLine;
-    UniqueString({var}LCmd);
+    UniqueString(LCmd);
 
-    if CreateProcess(nil, PChar(LCmd), nil, nil, True, NORMAL_PRIORITY_CLASS, nil, nil, start, {var}ProcessInfo) then
-    begin
+    var LBaseDir: PChar := nil;
+    if not ABaseDir.IsEmpty() then
+      LBaseDir := PChar(ABaseDir);
+
+    if CreateProcess(nil, PChar(LCmd), nil, nil, True, NORMAL_PRIORITY_CLASS, nil, LBaseDir, start, ProcessInfo) then begin
       repeat
         Apprunning := WaitForSingleObject(ProcessInfo.hProcess, 100);
         Application.ProcessMessages;
@@ -56,10 +59,14 @@ begin
 
       repeat
         BytesRead := 0;
-        ReadFile(readableEndOfPipe, Buffer[0], READ_BUFFER_SIZE, {var}BytesRead, nil);
-        Buffer[BytesRead]:= #0;
-        OemToAnsi(Buffer,Buffer);
-        CmdResult.Text := CmdResult.text + string(Buffer);
+        if PeekNamedPipe(readableEndOfPipe, nil, 0, nil, @dwBytesAvailable, nil) then begin
+          if dwBytesAvailable > 0 then begin
+            ReadFile(readableEndOfPipe, Buffer[0], READ_BUFFER_SIZE, BytesRead, nil);
+            Buffer[BytesRead]:= #0;
+            OemToAnsi(Buffer,Buffer);
+            CmdResult.Text := CmdResult.text + string(Buffer);
+          end;
+        end;
       until (BytesRead < READ_BUFFER_SIZE);
     end;
     FreeMem(Buffer);

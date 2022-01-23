@@ -14,10 +14,15 @@ type
       const AArchitecture: TArchitecture): string;
     function GetAppPythonFolder(): string;
     function GetApkPath(const AAppName: string): string;
+    function GetManifestPath(const AAppName: string): string;
+    function GetAppPath(const AAppName: string): string;
   public
     procedure CopyAppFiles(const AModel: TProjectModel);
-    procedure InstallApk(const AProjectModel: TProjectModel;
+    procedure UpdateManifest(const AModel: TProjectModel);
+    procedure BuildApk(const AProjectModel: TProjectModel;
       const AEnvironmentModel: TEnvironmentModel);
+    procedure InstallApk(const AProjectModel: TProjectModel;
+      const AEnvironmentModel: TEnvironmentModel);    
   end;
 
 implementation
@@ -26,21 +31,32 @@ uses
   System.IOUtils, System.SysUtils, Services.Factory;
 
 const
-  APPS_FOLDER = 'APPS';
+  APPS_FOLDER = 'apps';
+  APP_IMAGE_NAME = 'PyApp';
+  APP_IMAGE_APK_NAME = 'PyApp.apk';
 
 { TPreBuiltCopyService }
 
 function TAppService.GetApkPath(const AAppName: string): string;
 begin
+  Result := TPath.Combine(GetAppPath(AAppName), 'bin');
+  Result := TPath.Combine(Result, ChangeFileExt(AAppName, '.apk'));
+end;
+
+function TAppService.GetAppPath(const AAppName: string): string;
+begin
   Result := TPath.Combine(ExtractFilePath(ParamStr(0)), APPS_FOLDER);
   Result := TPath.Combine(Result, AAppName);
-  Result := TPath.Combine(Result, 'bin');
-  Result := TPath.Combine(Result, 'PyApp.apk');
 end;
 
 function TAppService.GetAppPythonFolder: string;
 begin
   Result := TPath.Combine('assets', 'internal');
+end;
+
+function TAppService.GetManifestPath(const AAppName: string): string;
+begin
+  Result := TPath.Combine(GetAppPath(AAppName), 'AndroidManifest.xml');
 end;
 
 function TAppService.GetPreBuiltFolder(
@@ -52,7 +68,7 @@ begin
     arm: Result := TPath.Combine(Result, 'arm');
     aarch64: Result := TPath.Combine(Result, 'aarch64');
   end;
-  Result := TPath.Combine(Result, 'PyApp');
+  Result := TPath.Combine(Result, APP_IMAGE_NAME);
 end;
 
 function TAppService.GetPythonZipFile(
@@ -90,12 +106,37 @@ begin
   end;
 end;
 
+procedure TAppService.UpdateManifest(const AModel: TProjectModel);
+begin
+  var LManifestPath := GetManifestPath(AModel.ApplicationName);
+  var LText := TFile.ReadAllText(LManifestPath, TEncoding.UTF8);
+  LText := LText
+    .Replace('package="com.embarcadero.PyApp"', Format('package="%s"', [AModel.PackageName]))
+    .Replace('android:versionCode="1"', Format('android:versionCode="%s"', [AModel.VersionCode.ToString()]))
+    .Replace('android:versionName="1.0.0"', Format('android:versionName="%s"', [AModel.VersionName]))
+    .Replace('android:label="PyApp"', Format('android:label="%s"', [AModel.ApplicationName]));
+
+  TFile.WriteAllText(LManifestPath, LText);
+end;
+
 { TPreBuiltCopyService }
+
+procedure TAppService.BuildApk(const AProjectModel: TProjectModel;
+  const AEnvironmentModel: TEnvironmentModel);
+begin
+  var LService := TServiceSimpleFactory.CreateAdb();
+  var LStrings := TStringList.Create();
+  try
+    LService.BuildApk(GetAppPath(AProjectModel.ApplicationName), 
+      AProjectModel.ApplicationName, AEnvironmentModel, LStrings);
+  finally
+    LStrings.Free();
+  end;
+end;
 
 procedure TAppService.CopyAppFiles(const AModel: TProjectModel);
 begin
-  var LAppPath := TPath.Combine(ExtractFilePath(ParamStr(0)), APPS_FOLDER);
-  LAppPath := TPath.Combine(LAppPath, AModel.ApplicationName);
+  var LAppPath := GetAppPath(AModel.ApplicationName);
 
   if TDirectory.Exists(LAppPath) then
     TDirectory.Delete(LAppPath, true);

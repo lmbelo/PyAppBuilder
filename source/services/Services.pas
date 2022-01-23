@@ -19,6 +19,8 @@ type
   IADBServices = interface
     ['{BAF1EE13-B459-4EBC-9E81-7C782F285F22}']
     procedure ListDevices(const AAdbPath: string; const AStrings: TStrings);
+    procedure BuildApk(const AAppBasePath, AAppName: string;
+      const AEnvironmentModel: TEnvironmentModel; const AResult: TStrings);
     procedure InstallApk(const AAdbPath: string; const AApkPath: string;
       const AResult: TStrings);
     procedure RunApp(const AAdbPath, APkgName: string; const AResult: TStrings);
@@ -27,6 +29,9 @@ type
   IAppServices = interface
     ['{0F669CC6-DB3A-437E-8724-8831719A3E9B}']
     procedure CopyAppFiles(const AModel: TProjectModel);
+    procedure UpdateManifest(const AModel: TProjectModel);
+    procedure BuildApk(const AProjectModel: TProjectModel;
+      const AEnvironmentModel: TEnvironmentModel);
     procedure InstallApk(const AProjectModel: TProjectModel;
       const AEnvironmentModel: TEnvironmentModel);
   end;

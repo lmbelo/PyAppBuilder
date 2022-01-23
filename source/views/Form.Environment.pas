@@ -16,9 +16,17 @@ type
     ListBoxItem1: TListBoxItem;
     edtSdkBasePath: TEdit;
     ListBoxItem2: TListBoxItem;
-    edtApkSignerLocation: TEdit;
+    edtJarSignerLocation: TEdit;
     ListBoxItem3: TListBoxItem;
     edtAdbLocation: TEdit;
+    ListBoxItem4: TListBoxItem;
+    edtAaptLocation: TEdit;
+    ListBoxItem5: TListBoxItem;
+    edtSdkAPILocation: TEdit;
+    ListBoxItem6: TListBoxItem;
+    edtZipAlign: TEdit;
+    ListBoxItem7: TListBoxItem;
+    edtKeyTool: TEdit;
   protected
     procedure FormUpdate(); override;
     procedure ModelUpdate(); override;
@@ -40,8 +48,12 @@ procedure TEnvironmentForm.FormUpdate;
 begin
   with Model as TEnvironmentModel do begin
     edtSdkBasePath.Text := SdkBasePath;
-    edtApkSignerLocation.Text := ApkSignerLocation;
+    edtJarSignerLocation.Text := JarSignerLocation;
     edtAdbLocation.Text := AdbLocation;
+    edtAaptLocation.Text := AAptLocation;
+    edtSdkAPILocation.Text := SdkApiLocation;
+    edtZipAlign.Text := ZipAlignLocation;
+    edtKeyTool.Text := KeyToolLocation;
   end;
 end;
 
@@ -49,8 +61,12 @@ procedure TEnvironmentForm.ModelUpdate;
 begin
   with Model as TEnvironmentModel do begin
     SdkBasePath := edtSdkBasePath.Text;
-    ApkSignerLocation := edtApkSignerLocation.Text;
+    JarSignerLocation := edtJarSignerLocation.Text;
     AdbLocation := edtAdbLocation.Text;
+    AAptLocation := edtAaptLocation.Text;
+    SdkApiLocation := edtSdkAPILocation.Text;
+    ZipAlignLocation := edtZipAlign.Text;
+    KeyToolLocation := edtKeyTool.Text;
   end;
 end;
 

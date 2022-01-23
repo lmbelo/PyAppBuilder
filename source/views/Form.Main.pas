@@ -93,15 +93,19 @@ begin
   var LAppService := TServiceSimpleFactory.CreateApp();
   var LProjectStorage := TDefaultStorage<TProjectModel>.Make();
   var LProjectModel: TProjectModel := nil;
-  if LProjectStorage.LoadModel(LProjectModel) then begin
-    LAppService.CopyAppFiles(LProjectModel);
-  end else raise Exception.Create('Application defs not set.');
-
   var LEnvironmentStorage := TDefaultStorage<TEnvironmentModel>.Make();
   var LEnvironmentModel: TEnvironmentModel := nil;
-  if LEnvironmentStorage.LoadModel(LEnvironmentModel) then begin
-    LAppService.InstallApk(LProjectModel, LEnvironmentModel);
-  end else raise Exception.Create('Environment defs not set.');
+
+  if not LProjectStorage.LoadModel(LProjectModel) then
+    raise Exception.Create('Application defs not set.');
+
+  if not LEnvironmentStorage.LoadModel(LEnvironmentModel) then
+    raise Exception.Create('Environment defs not set.');
+
+  LAppService.CopyAppFiles(LProjectModel);
+  LAppService.UpdateManifest(LProjectModel);
+  LAppService.BuildApk(LProjectModel, LEnvironmentModel);
+  LAppService.InstallApk(LProjectModel, LEnvironmentModel);
 
   var LAdbService := TServiceSimpleFactory.CreateAdb();
   var LResult := TStringList.Create();
@@ -135,6 +139,7 @@ begin
       try
         var LService := TServiceSimpleFactory.CreateAdb();
         var LAdbPath := LStorage.GetAdbPath();
+
         if not LAdbPath.IsEmpty() then
           LService.ListDevices(LAdbPath, LDevices);
       finally
@@ -158,6 +163,7 @@ procedure TMainForm.Log(const AString: string);
 begin
   TThread.Synchronize(nil, procedure begin
     mmLog.Lines.Add(AString);
+    mmLog.GoToLineEnd();
   end);
 end;
 
