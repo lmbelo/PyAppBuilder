@@ -3,15 +3,14 @@ unit Model.Project;
 interface
 
 uses
-  REST.Json.Types, Model;
+  REST.Json.Types, Model, Architecture, PythonVersion;
 
 type
-  TPythonVersion = (cp38, cp39, cp310);
-  TArchitecture = (arm, aarch64);
-
   [Model('project')]
   TProjectModel = class
   private
+    [JSONName('application_name')]
+    FApplicationName: string;
     [JSONName('package_name')]
     FPackageName: string;
     [JSONName('version_code')]
@@ -23,6 +22,7 @@ type
     [JSONName('architecture')]
     FArchitecture: TArchitecture;
   public
+    property ApplicationName: string read FApplicationName write FApplicationName;
     property PackageName: string read FPackageName write FPackageName;
     property VersionCode: integer read FVersionCode write FVersionCode;
     property VersionName: string read FVersionName write FVersionName;

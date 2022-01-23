@@ -19,9 +19,6 @@ type
     edtApkSignerLocation: TEdit;
     ListBoxItem3: TListBoxItem;
     edtAdbLocation: TEdit;
-    ListBoxGroupHeader2: TListBoxGroupHeader;
-    ListBoxItem4: TListBoxItem;
-    edtPythonDistBasePath: TEdit;
   protected
     procedure FormUpdate(); override;
     procedure ModelUpdate(); override;
@@ -45,7 +42,6 @@ begin
     edtSdkBasePath.Text := SdkBasePath;
     edtApkSignerLocation.Text := ApkSignerLocation;
     edtAdbLocation.Text := AdbLocation;
-    edtPythonDistBasePath.Text := PythonDistBasePath;
   end;
 end;
 
@@ -55,7 +51,6 @@ begin
     SdkBasePath := edtSdkBasePath.Text;
     ApkSignerLocation := edtApkSignerLocation.Text;
     AdbLocation := edtAdbLocation.Text;
-    PythonDistBasePath := edtPythonDistBasePath.Text;
   end;
 end;
 

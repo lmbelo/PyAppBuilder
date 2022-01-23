@@ -15,15 +15,21 @@ uses
   Form.Data in 'source\views\Form.Data.pas' {DataForm},
   Form.Factory in 'source\views\Form.Factory.pas',
   Form.Slider in 'source\views\Form.Slider.pas',
-  Services.IDE in 'source\services\Services.IDE.pas',
+  Services in 'source\services\Services.pas',
   {$IFDEF MSWINDOWS}
   Services.ADB.Win in 'source\services\Services.ADB.Win.pas',
   {$ELSE}
   Services.ADB.Posix in 'source\services\Services.ADB.Posix.pas',
   {$ENDIF }
-  Services.ADB in 'source\services\Services.ADB.pas',
+  Services.ADB in 'source\services\Services.ADB.pas' {S},
   Model in 'source\models\Model.pas',
-  Form.Base in 'source\views\Form.Base.pas' {BaseForm};
+  Form.Base in 'source\views\Form.Base.pas' {BaseForm},
+  Services.App in 'source\services\Services.App.pas',
+  Architecture in 'source\Architecture.pas',
+  PythonVersion in 'source\PythonVersion.pas',
+  Storage.Environment in 'source\storage\Storage.Environment.pas',
+  Storage.Factory in 'source\storage\Storage.Factory.pas',
+  Services.Factory in 'source\services\Services.Factory.pas';
 
 {$R *.res}
 

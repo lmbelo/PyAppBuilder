@@ -7,10 +7,11 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Memo.Types,
   FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.Layouts, FMX.ListBox,
   FMX.StdCtrls, FMX.TabControl, System.Actions, FMX.ActnList, FMX.Ani,
-  FMX.Objects, Form.Base, Services.IDE;
+  FMX.Objects, Form.Base, Services, Storage.Factory, Storage.Default,
+  Model.Project;
 
 type
-  TMainForm = class(TBaseForm, IServices, ILogServices, IADBServices)
+  TMainForm = class(TBaseForm, IServices, ILogServices)
     loEditor: TLayout;
     mmEditor: TMemo;
     pnlLeftMenu: TPanel;
@@ -38,13 +39,11 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure btnRefreshDeviceClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure ListBoxItem2Click(Sender: TObject);
   private
-    FADBServices: IADBServices;
     procedure LoadDevices();
   public
     procedure Log(const AString: string);
-
-    property ADBServices: IADBServices read FADBServices implements IADBServices;
   end;
 
 var
@@ -54,7 +53,7 @@ implementation
 
 uses
   System.Threading,
-  Container.Images, Form.Factory, Form.Slider, Services.ADB;
+  Container.Images, Form.Factory, Form.Slider, Services.Factory, Services.ADB;
 
 {$R *.fmx}
 
@@ -66,12 +65,10 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   GlobalServices := Self;
-  FADBServices := TADBService.Create();
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
-  FADBServices := nil;
   GlobalServices := nil;
 end;
 
@@ -88,6 +85,17 @@ begin
   finally
     LForm.Free();
   end;
+end;
+
+procedure TMainForm.ListBoxItem2Click(Sender: TObject);
+begin
+  inherited;
+  var LStorage := TDefaultStorage<TProjectModel>.Make();
+  var LModel: TProjectModel := nil;
+  if LStorage.LoadModel(LModel) then begin
+    var LService := TServiceSimpleFactory.CreateApp();
+    LService.CopyAppFiles(LModel);
+  end else raise Exception.Create('Application defs not set.');
 end;
 
 procedure TMainForm.ListBoxItem3Click(Sender: TObject);
@@ -109,8 +117,12 @@ begin
   TTask.Run(procedure begin
     var LDevices := TStringList.Create();
     try
+      var LStorage := TStorageSimpleFactory.CreateEnvironment();
       try
-        FADBServices.ListDevices(LDevices);
+        var LService := TServiceSimpleFactory.CreateAdb();
+        var LAdbPath := LStorage.GetAdbPath();
+        if not LAdbPath.IsEmpty() then
+          LService.ListDevices(LAdbPath, LDevices);
       finally
         TThread.Synchronize(nil, procedure begin
           cbDevice.Items.Text := LDevices.Text;

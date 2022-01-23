@@ -3,18 +3,17 @@ unit Services.ADB;
 interface
 
 uses
-  Services.IDE, System.Classes, System.SysUtils;
+  Services, System.Classes, System.SysUtils;
 
 type
   TADBService = class(TInterfacedObject, IADBServices)
   private
     procedure ExecCmd(const CmdLine: string; CmdResult: TStrings);
   private
-    function GetAdbPath(): string;
     procedure EnumDevices(const ADeviceList: TStrings; const AProc: TProc<string>);
-    function FindDeviceVendorModel(const ADevice: string): string;
+    function FindDeviceVendorModel(const AAdbPath, ADevice: string): string;
   public
-    procedure ListDevices(const AStrings: TStrings);
+    procedure ListDevices(const AAdbPath: string; const AStrings: TStrings);
   end;
 
 implementation
@@ -65,11 +64,11 @@ begin
     LLog.Log(CmdResult.Text);
 end;
 
-function TADBService.FindDeviceVendorModel(const ADevice: string): string;
+function TADBService.FindDeviceVendorModel(const AAdbPath, ADevice: string): string;
 begin
   var LStrings := TStringList.Create();
   try
-    ExecCmd(GetAdbPath() + Format(' -s %s shell getprop ro.product.model', [ADevice]), LStrings);
+    ExecCmd(AAdbPath + Format(' -s %s shell getprop ro.product.model', [ADevice]), LStrings);
     Result := LStrings.Text
       .Replace(#13#10, String.Empty);
   finally
@@ -77,23 +76,13 @@ begin
   end;
 end;
 
-function TADBService.GetAdbPath: string;
-begin
-  var LStorage := TDefaultStorage<TEnvironmentModel>.Make();
-  var LModel: TEnvironmentModel := nil;
-  if LStorage.LoadModel(LModel) then
-    Result := LModel.AdbLocation
-  else
-    Result := string.Empty;
-end;
-
-procedure TADBService.ListDevices(const AStrings: TStrings);
+procedure TADBService.ListDevices(const AAdbPath: string; const AStrings: TStrings);
 begin
   var LStrings := TStringList.Create();
   try
-    ExecCmd(GetAdbPath() + ' devices', LStrings);
+    ExecCmd(AAdbPath + ' devices', LStrings);
     EnumDevices(LStrings, procedure(ADevice: string) begin
-      AStrings.Add(FindDeviceVendorModel(ADevice));
+      AStrings.Add(FindDeviceVendorModel(AAdbPath, ADevice));
     end);
   finally
     LStrings.Free();

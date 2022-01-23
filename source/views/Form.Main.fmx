@@ -195,6 +195,7 @@ inherited MainForm: TMainForm
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 3
+        OnClick = ListBoxItem2Click
       end
     end
   end
