@@ -45,8 +45,8 @@ inherited MainForm: TMainForm
           Size.Height = 631.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 0
-          Viewport.Width = 969.000000000000000000
-          Viewport.Height = 631.000000000000000000
+          Viewport.Width = 965.000000000000000000
+          Viewport.Height = 627.000000000000000000
         end
       end
     end
@@ -118,8 +118,8 @@ inherited MainForm: TMainForm
       Size.Height = 73.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
-      Viewport.Width = 1023.000000000000000000
-      Viewport.Height = 73.000000000000000000
+      Viewport.Width = 1019.000000000000000000
+      Viewport.Height = 69.000000000000000000
     end
   end
   object pnlLeftMenu: TPanel
@@ -139,8 +139,8 @@ inherited MainForm: TMainForm
       DefaultItemStyles.ItemStyle = 'listboxitemnodetail'
       DefaultItemStyles.GroupHeaderStyle = 'listboxgroupheader'
       DefaultItemStyles.GroupFooterStyle = ''
-      Viewport.Width = 54.000000000000000000
-      Viewport.Height = 695.000000000000000000
+      Viewport.Width = 50.000000000000000000
+      Viewport.Height = 691.000000000000000000
       object ListBoxGroupHeader1: TListBoxGroupHeader
         TextSettings.HorzAlign = Center
         StyledSettings = [Family, Size, Style, FontColor]

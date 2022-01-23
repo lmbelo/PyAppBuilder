@@ -14,6 +14,8 @@ type
     function FindDeviceVendorModel(const AAdbPath, ADevice: string): string;
   public
     procedure ListDevices(const AAdbPath: string; const AStrings: TStrings);
+    procedure InstallApk(const AAdbPath: string; const AApkPath: string; const AResult: TStrings);
+    procedure RunApp(const AAdbPath, APkgName: string; const AResult: TStrings);
   end;
 
 implementation
@@ -76,6 +78,16 @@ begin
   end;
 end;
 
+procedure TADBService.InstallApk(const AAdbPath, AApkPath: string; const AResult: TStrings);
+begin
+  var LStrings := TStringList.Create();
+  try
+    ExecCmd(AAdbPath + ' install -r ' + AApkPath, LStrings);
+  finally
+    LStrings.Free();
+  end;
+end;
+
 procedure TADBService.ListDevices(const AAdbPath: string; const AStrings: TStrings);
 begin
   var LStrings := TStringList.Create();
@@ -87,6 +99,14 @@ begin
   finally
     LStrings.Free();
   end;
+end;
+
+procedure TADBService.RunApp(const AAdbPath, APkgName: string;
+  const AResult: TStrings);
+begin
+  ExecCmd(AAdbPath
+    + Format(' shell am start -n %s/com.embarcadero.firemonkey.FMXNativeActivity', [
+    APkgName]), AResult);
 end;
 
 end.

@@ -3,7 +3,8 @@ unit Services.App;
 interface
 
 uses
-  Services, Architecture, PythonVersion, Model.Project;
+  Services, Architecture, PythonVersion, Model.Project, Model.Environment, 
+  System.Classes;
 
 type
   TAppService = class(TInterfacedObject, IAppServices)
@@ -12,16 +13,30 @@ type
     function GetPythonZipFile(const APythonVersion: TPythonVersion;
       const AArchitecture: TArchitecture): string;
     function GetAppPythonFolder(): string;
+    function GetApkPath(const AAppName: string): string;
   public
     procedure CopyAppFiles(const AModel: TProjectModel);
+    procedure InstallApk(const AProjectModel: TProjectModel;
+      const AEnvironmentModel: TEnvironmentModel);
   end;
 
 implementation
 
 uses
-  System.IOUtils, System.SysUtils;
+  System.IOUtils, System.SysUtils, Services.Factory;
+
+const
+  APPS_FOLDER = 'APPS';
 
 { TPreBuiltCopyService }
+
+function TAppService.GetApkPath(const AAppName: string): string;
+begin
+  Result := TPath.Combine(ExtractFilePath(ParamStr(0)), APPS_FOLDER);
+  Result := TPath.Combine(Result, AAppName);
+  Result := TPath.Combine(Result, 'bin');
+  Result := TPath.Combine(Result, 'PyApp.apk');
+end;
 
 function TAppService.GetAppPythonFolder: string;
 begin
@@ -31,7 +46,8 @@ end;
 function TAppService.GetPreBuiltFolder(
   const AArchitecture: TArchitecture): string;
 begin
-  Result := TPath.Combine(ExtractFilePath(ParamStr(0)), 'pre-built');
+  Result := TPath.Combine(ExtractFilePath(ParamStr(0)), 'android');
+  Result := TPath.Combine(Result, 'pre-built');
   case AArchitecture of
     arm: Result := TPath.Combine(Result, 'arm');
     aarch64: Result := TPath.Combine(Result, 'aarch64');
@@ -58,11 +74,27 @@ begin
   Result := TPath.Combine(Result, 'build.zip');
 end;
 
+procedure TAppService.InstallApk(const AProjectModel: TProjectModel;
+  const AEnvironmentModel: TEnvironmentModel);
+begin
+  var LApkPath := GetApkPath(AProjectModel.ApplicationName);
+  if not TFile.Exists(LApkPath) then
+    raise Exception.CreateFmt('Apk file %s not found at: %s', [AProjectModel.ApplicationName, LApkPath]);
+
+  var LService := TServiceSimpleFactory.CreateAdb();
+  var LStrings := TStringList.Create();
+  try
+    LService.InstallApk(AEnvironmentModel.AdbLocation, LApkPath, LStrings);
+  finally
+    LStrings.Free();
+  end;
+end;
+
 { TPreBuiltCopyService }
 
 procedure TAppService.CopyAppFiles(const AModel: TProjectModel);
 begin
-  var LAppPath := TPath.Combine(ExtractFilePath(ParamStr(0)), 'apps');
+  var LAppPath := TPath.Combine(ExtractFilePath(ParamStr(0)), APPS_FOLDER);
   LAppPath := TPath.Combine(LAppPath, AModel.ApplicationName);
 
   if TDirectory.Exists(LAppPath) then

@@ -8,7 +8,7 @@ uses
   FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.Layouts, FMX.ListBox,
   FMX.StdCtrls, FMX.TabControl, System.Actions, FMX.ActnList, FMX.Ani,
   FMX.Objects, Form.Base, Services, Storage.Factory, Storage.Default,
-  Model.Project;
+  Model.Project, Model.Environment;
 
 type
   TMainForm = class(TBaseForm, IServices, ILogServices)
@@ -90,12 +90,26 @@ end;
 procedure TMainForm.ListBoxItem2Click(Sender: TObject);
 begin
   inherited;
-  var LStorage := TDefaultStorage<TProjectModel>.Make();
-  var LModel: TProjectModel := nil;
-  if LStorage.LoadModel(LModel) then begin
-    var LService := TServiceSimpleFactory.CreateApp();
-    LService.CopyAppFiles(LModel);
+  var LAppService := TServiceSimpleFactory.CreateApp();
+  var LProjectStorage := TDefaultStorage<TProjectModel>.Make();
+  var LProjectModel: TProjectModel := nil;
+  if LProjectStorage.LoadModel(LProjectModel) then begin
+    LAppService.CopyAppFiles(LProjectModel);
   end else raise Exception.Create('Application defs not set.');
+
+  var LEnvironmentStorage := TDefaultStorage<TEnvironmentModel>.Make();
+  var LEnvironmentModel: TEnvironmentModel := nil;
+  if LEnvironmentStorage.LoadModel(LEnvironmentModel) then begin
+    LAppService.InstallApk(LProjectModel, LEnvironmentModel);
+  end else raise Exception.Create('Environment defs not set.');
+
+  var LAdbService := TServiceSimpleFactory.CreateAdb();
+  var LResult := TStringList.Create();
+  try
+    LAdbService.RunApp(LEnvironmentModel.AdbLocation, LProjectModel.PackageName, LResult);
+  finally
+    LResult.Free();
+  end;
 end;
 
 procedure TMainForm.ListBoxItem3Click(Sender: TObject);
