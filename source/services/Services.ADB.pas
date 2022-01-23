@@ -9,6 +9,8 @@ type
   TADBService = class(TInterfacedObject, IADBServices)
   private
     procedure ExecCmd(const CmdLine, ABaseDir: string; CmdResult: TStrings);
+    procedure EnumAssets(const AAssetsBasePath: string; const AProc: TProc<string>);
+    procedure EnumLibraries(const ALibBasePath: string; const AProc: TProc<string>);
   private
     procedure EnumDevices(const ADeviceList: TStrings; const AProc: TProc<string>);
     function FindDeviceVendorModel(const AAdbPath, ADevice: string): string;
@@ -44,13 +46,17 @@ const
 
   CMD_4 = '$AAPT add $APPNAME.unaligned.apk classes.dex';
 
-  CMD_5 = 'xcopy $APPBASEPATH\library\lib\ $APPBASEPATH\bin\lib\ /y /E /H /C /I';
+  CMD_5 = 'xcopy $APPBASEPATH\assets $APPBASEPATH\bin\assets /y /E /H /C /I';
 
-  CMD_6 = '$AAPT add $APPNAME.unaligned.apk lib/arm64-v8a/libPyApp.so';
+  CMD_6 = '$AAPT add $APPNAME.unaligned.apk $FILE';
 
-  CMD_7 = '$JARSIGNER -keystore cert\PyApp.keystore -storepass delphirocks bin\$APPNAME.unaligned.apk PyApp';
+  CMD_7 = 'xcopy $APPBASEPATH\library\lib $APPBASEPATH\bin\lib /y /E /H /C /I';
 
-  CMD_8 = '$ZIPALIGN -f 4 bin\$APPNAME.unaligned.apk bin\$APPNAME.apk';
+  CMD_8 = '$AAPT add $APPNAME.unaligned.apk $FILE';
+
+  CMD_9 = '$JARSIGNER -keystore cert\PyApp.keystore -storepass delphirocks bin\$APPNAME.unaligned.apk PyApp';
+
+  CMD_10 = '$ZIPALIGN -f 4 bin\$APPNAME.unaligned.apk bin\$APPNAME.apk';
 begin
   var LCmd := CMD_1
     .Replace('$AAPT', AEnvironmentModel.AAptLocation)
@@ -82,23 +88,58 @@ begin
 
   ExecCmd(LCmd, String.Empty, AResult);
 
-  LCmd := CMD_6
-    .Replace('$AAPT', AEnvironmentModel.AAptLocation)
-    .Replace('$APPNAME', AAppName);
+  EnumAssets(TPath.Combine(TPath.Combine(AAppBasePath, 'bin'), 'assets'), procedure(AFile: string) begin
+    LCmd := CMD_6
+      .Replace('$AAPT', AEnvironmentModel.AAptLocation)
+      .Replace('$APPNAME', AAppName)
+      .Replace('$FILE', AFile);
 
-  ExecCmd(LCmd, TPath.Combine(AAppBasePath, 'bin'), AResult);
+    ExecCmd(LCmd, TPath.Combine(AAppBasePath, 'bin'), AResult);
+  end);
 
   LCmd := CMD_7
+    .Replace('$APPBASEPATH', AAppBasePath);
+
+  ExecCmd(LCmd, String.Empty, AResult);
+
+  EnumLibraries(TPath.Combine(TPath.Combine(AAppBasePath, 'bin'), 'lib'), procedure(AFile: string) begin
+    LCmd := CMD_8
+      .Replace('$AAPT', AEnvironmentModel.AAptLocation)
+      .Replace('$APPNAME', AAppName)
+      .Replace('$FILE', AFile);
+
+    ExecCmd(LCmd, TPath.Combine(AAppBasePath, 'bin'), AResult);
+  end);
+
+  LCmd := CMD_9
     .Replace('$JARSIGNER', AEnvironmentModel.JarSignerLocation)
     .Replace('$APPNAME', AAppName);
 
   ExecCmd(LCmd, AAppBasePath, AResult);
 
-  LCmd := CMD_8
+  LCmd := CMD_10
     .Replace('$ZIPALIGN', AEnvironmentModel.ZipAlignLocation)
     .Replace('$APPNAME', AAppName);
 
   ExecCmd(LCmd, AAppBasePath, AResult);
+end;
+
+procedure TADBService.EnumAssets(const AAssetsBasePath: string;
+  const AProc: TProc<string>);
+begin
+  if not Assigned(AProc) then
+    Exit;
+
+  for var LFile in TDirectory.GetFiles(AAssetsBasePath, '*.*', TSearchOption.soAllDirectories) do begin
+    var LRelativeFilePath := LFile
+      .Replace(AAssetsBasePath, String.Empty)
+      .Replace('\', '/');
+
+    if LRelativeFilePath.StartsWith('/') then
+      LRelativeFilePath := LRelativeFilePath.Remove(0, 1);
+
+    AProc('assets/' + LRelativeFilePath);
+  end;
 end;
 
 procedure TADBService.EnumDevices(const ADeviceList: TStrings;
@@ -121,6 +162,24 @@ begin
       if TryStrToFloat(LDevice, LValue) then
         AProc(LDevice);
     end;
+  end;
+end;
+
+procedure TADBService.EnumLibraries(const ALibBasePath: string;
+  const AProc: TProc<string>);
+begin
+  if not Assigned(AProc) then
+    Exit;
+
+  for var LFile in TDirectory.GetFiles(ALibBasePath, '*.so', TSearchOption.soAllDirectories) do begin
+    var LRelativeFilePath := LFile
+      .Replace(ALibBasePath, String.Empty)
+      .Replace('\', '/');
+
+    if LRelativeFilePath.StartsWith('/') then
+      LRelativeFilePath := LRelativeFilePath.Remove(0, 1);
+
+    AProc('lib/' + LRelativeFilePath);
   end;
 end;
 
