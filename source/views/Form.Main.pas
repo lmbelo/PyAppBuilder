@@ -142,15 +142,15 @@ begin
   //Create and sign the APK file
   if LAppService.BuildApk(LProjectModel, LEnvironmentModel) then begin
     //Install the APK on the device
-    LAppService.InstallApk(LProjectModel, LEnvironmentModel, FDevices.Names[cbDevice.ItemIndex]);
-
-    var LAdbService := TServiceSimpleFactory.CreateAdb();
-    var LResult := TStringList.Create();
-    try
-      LAdbService.RunApp(LEnvironmentModel.AdbLocation, LProjectModel.PackageName,
-        FDevices.Names[cbDevice.ItemIndex], LResult);
-    finally
-      LResult.Free();
+    if LAppService.InstallApk(LProjectModel, LEnvironmentModel, FDevices.Names[cbDevice.ItemIndex]) then begin
+      var LAdbService := TServiceSimpleFactory.CreateAdb();
+      var LResult := TStringList.Create();
+      try
+        LAdbService.RunApp(LEnvironmentModel.AdbLocation, LProjectModel.PackageName,
+          FDevices.Names[cbDevice.ItemIndex], LResult);
+      finally
+        LResult.Free();
+      end;
     end;
   end;
 end;
@@ -200,7 +200,8 @@ procedure TMainForm.Log(const AString: string);
 begin
   TThread.Synchronize(nil, procedure begin
     mmLog.Lines.Add(AString);
-    mmLog.GoToLineEnd();
+    mmLog.GoToTextEnd();
+    mmLog.GoToLineBegin();
   end);
 end;
 

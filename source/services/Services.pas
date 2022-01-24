@@ -21,8 +21,8 @@ type
     procedure ListDevices(const AAdbPath: string; const AStrings: TStrings);
     function BuildApk(const AAppBasePath, AAppName: string;
       const AEnvironmentModel: TEnvironmentModel; const AResult: TStrings): boolean;
-    procedure InstallApk(const AAdbPath, AApkPath, ADevice: string;
-      const AResult: TStrings);
+    function InstallApk(const AAdbPath, AApkPath, ADevice: string;
+      const AResult: TStrings): boolean;
     procedure RunApp(const AAdbPath, APkgName, ADevice: string; const AResult: TStrings);
   end;
 
@@ -32,8 +32,8 @@ type
     procedure UpdateManifest(const AModel: TProjectModel);
     function BuildApk(const AProjectModel: TProjectModel;
       const AEnvironmentModel: TEnvironmentModel): boolean;
-    procedure InstallApk(const AProjectModel: TProjectModel;
-      const AEnvironmentModel: TEnvironmentModel; const ADevice: string);
+    function InstallApk(const AProjectModel: TProjectModel;
+      const AEnvironmentModel: TEnvironmentModel; const ADevice: string): boolean;
     procedure AddScriptFile(const AModel: TProjectModel; const AFileName: string;
       const AStream: TStream);
   end;

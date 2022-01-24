@@ -30,8 +30,8 @@ type
     procedure UpdateManifest(const AModel: TProjectModel);
     function BuildApk(const AProjectModel: TProjectModel;
       const AEnvironmentModel: TEnvironmentModel): boolean;
-    procedure InstallApk(const AProjectModel: TProjectModel;
-      const AEnvironmentModel: TEnvironmentModel; const ADevice: string);
+    function InstallApk(const AProjectModel: TProjectModel;
+      const AEnvironmentModel: TEnvironmentModel; const ADevice: string): boolean;
   end;
 
 implementation
@@ -139,17 +139,19 @@ begin
   Result := TPath.Combine(Result, 'build.zip');
 end;
 
-procedure TAppService.InstallApk(const AProjectModel: TProjectModel;
-  const AEnvironmentModel: TEnvironmentModel; const ADevice: string);
+function TAppService.InstallApk(const AProjectModel: TProjectModel;
+  const AEnvironmentModel: TEnvironmentModel; const ADevice: string): boolean;
 begin
   var LApkPath := GetApkPath(AProjectModel.ApplicationName);
   if not TFile.Exists(LApkPath) then
-    raise Exception.CreateFmt('Apk file %s not found at: %s', [AProjectModel.ApplicationName, LApkPath]);
+    raise Exception.CreateFmt('Apk file %s not found at: %s', [
+      AProjectModel.ApplicationName, LApkPath]);
 
   var LService := TServiceSimpleFactory.CreateAdb();
   var LStrings := TStringList.Create();
   try
-    LService.InstallApk(AEnvironmentModel.AdbLocation, LApkPath, ADevice, LStrings);
+    Result := LService.InstallApk(AEnvironmentModel.AdbLocation, LApkPath,
+      ADevice, LStrings);
   finally
     LStrings.Free();
   end;

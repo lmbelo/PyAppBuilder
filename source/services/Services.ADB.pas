@@ -16,7 +16,7 @@ type
     function FindDeviceVendorModel(const AAdbPath, ADevice: string): string;
   public
     procedure ListDevices(const AAdbPath: string; const AStrings: TStrings);
-    procedure InstallApk(const AAdbPath, AApkPath, ADevice: string; const AResult: TStrings);
+    function InstallApk(const AAdbPath, AApkPath, ADevice: string; const AResult: TStrings): boolean;
     procedure RunApp(const AAdbPath, APkgName, ADevice: string; const AResult: TStrings);
 
     function BuildApk(const AAppBasePath, AAppName: string;
@@ -217,11 +217,13 @@ begin
   end;
 end;
 
-procedure TADBService.InstallApk(const AAdbPath, AApkPath, ADevice: string; const AResult: TStrings);
+function TADBService.InstallApk(const AAdbPath, AApkPath, ADevice: string; const AResult: TStrings): boolean;
 begin
   var LStrings := TStringList.Create();
   try
     ExecCmd(AAdbPath + Format(' -s %s install -r ', [ADevice]) + AApkPath, String.Empty, LStrings);
+    AResult.AddStrings(LStrings);
+    Result := (not LStrings.Text.Contains('failure')) and (not LStrings.Text.Contains('failed'));
   finally
     LStrings.Free();
   end;
