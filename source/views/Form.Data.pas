@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.ImgList,
   FMX.StdCtrls, FMX.Controls.Presentation, FMX.Edit, FMX.ListBox, FMX.Layouts,
-  FMX.Objects, System.Actions, FMX.ActnList, System.Rtti, FMX.Ani, Form.Base;
+  FMX.Objects, System.Actions, FMX.ActnList, System.Rtti, FMX.Ani, Form.Base, Model;
 
 type
   TDataForm = class(TBaseForm)
@@ -29,20 +29,23 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
-    FModel: TObject;
+    FModel: TModel;
   protected
     //Create the model that represents the form data
-    function CreateModel(): TObject; virtual;
+    function CreateModel(): TModel; virtual;
     function GetEntityType(): TClass; virtual;
     //Form fields updates
     procedure FormUpdate(); virtual; abstract;
     procedure ModelUpdate(); virtual; abstract;
 
+    //Model validation
+    procedure ModelValidate(); virtual;
+
     procedure Load(); virtual;
     procedure Save(); virtual;
     procedure Cancel(); virtual;
 
-    property Model: TObject read FModel;
+    property Model: TModel read FModel;
   public
     { Public declarations }
   end;
@@ -97,11 +100,11 @@ begin
   end;
 end;
 
-function TDataForm.CreateModel: TObject;
+function TDataForm.CreateModel: TModel;
 begin
   var LEntityType := GetEntityType();
   if Assigned(LEntityType) then begin
-    Result := LEntityType.NewInstance();
+    Result := LEntityType.NewInstance() as TModel;
     Result.Create();
   end else
     raise Exception.Create('Model not initialized.');
@@ -125,13 +128,25 @@ end;
 procedure TDataForm.Load;
 begin
   var LStorage: IStorage := TDefaultStorage<TObject>.Make();
-  if LStorage.LoadModel(GetEntityType().ClassInfo, FModel) then
+  if LStorage.LoadModel(GetEntityType().ClassInfo, TObject(FModel)) then
     FormUpdate();
+end;
+
+procedure TDataForm.ModelValidate;
+begin
+  var LErrors := TStringList.Create();
+  try
+    if not FModel.Validate(LErrors) then
+      raise EModelValidationError.Create(LErrors.Text);
+  finally
+    LErrors.Free();
+  end;
 end;
 
 procedure TDataForm.Save;
 begin
   ModelUpdate();
+  ModelValidate();
   var LStorage: IStorage := TDefaultStorage<TObject>.Make();
   LStorage.SaveModel(GetEntityType().ClassInfo, FModel);
   Close();
@@ -141,7 +156,7 @@ end;
 
 constructor EntityAttribute.Create(const AModelType: TClass);
 begin
- FModelType := AModelType;
+  FModelType := AModelType;
 end;
 
 end.
