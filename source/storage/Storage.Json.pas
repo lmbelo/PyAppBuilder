@@ -3,10 +3,10 @@ unit Storage.Json;
 interface
 
 uses
-  Storage, REST.JsonReflect, System.TypInfo;
+  REST.JsonReflect, System.TypInfo, Storage, Model;
 
 type
-  TJsonStorage<ModelType : Class> = class(TInterfacedObject, IStorage, IStorage<ModelType>)
+  TJsonStorage<ModelType : class> = class(TInterfacedObject, IStorage, IStorage<ModelType>)
   private
     FConverters: TJSONConverters;
     function GetBasePath(): string;
@@ -28,7 +28,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.IOUtils, System.JSON, System.Rtti, Model;
+  System.SysUtils, System.IOUtils, System.JSON, System.Rtti;
 
 { TJsonStorage<Model> }
 

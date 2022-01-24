@@ -6,7 +6,7 @@ uses
   Storage;
 
 type
-  TDefaultStorage<Model: Class> = class(TInterfacedObject, IStorage<Model>)
+  TDefaultStorage<Model: class> = class(TInterfacedObject, IStorage<Model>)
   private
      FDefaultStorage: IStorage<Model>;
   protected

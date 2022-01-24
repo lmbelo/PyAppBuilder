@@ -12,7 +12,7 @@ type
     function LoadModel(const ATypeInfo: PTypeInfo; var AModel: TObject; const AEntity: string = ''): boolean;
   end;
 
-  IStorage<Model : Class> = interface(IStorage)
+  IStorage<Model : class> = interface(IStorage)
     ['{37366D5D-ECDA-4282-8762-CF87B7B440F7}']
     procedure SaveModel(const AModel: Model; const AEntity: string = '');
     function LoadModel(var AModel: Model; const AEntity: string = ''): boolean;
