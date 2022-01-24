@@ -120,6 +120,15 @@ begin
   end;
 
   LAppService.CopyAppFiles(LProjectModel);
+
+  var LStream := TMemoryStream.Create();
+  try
+    mmEditor.Lines.SaveToStream(LStream);
+    LAppService.AddScriptFile(LProjectModel, 'main.py', LStream);
+  finally
+    LStream.Free();
+  end;
+
   LAppService.UpdateManifest(LProjectModel);
   if LAppService.BuildApk(LProjectModel, LEnvironmentModel) then begin
     LAppService.InstallApk(LProjectModel, LEnvironmentModel);

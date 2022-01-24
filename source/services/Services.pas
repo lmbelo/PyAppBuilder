@@ -34,6 +34,8 @@ type
       const AEnvironmentModel: TEnvironmentModel): boolean;
     procedure InstallApk(const AProjectModel: TProjectModel;
       const AEnvironmentModel: TEnvironmentModel);
+    procedure AddScriptFile(const AModel: TProjectModel; const AFileName: string;
+      const AStream: TStream);
   end;
 
 var

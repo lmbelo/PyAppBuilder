@@ -19,8 +19,11 @@ type
     function GetApkPath(const AAppName: string): string;
     function GetManifestPath(const AAppName: string): string;
     function GetAppPath(const AAppName: string): string;
+    function GetAppAssetsInternal(const AAppName: string): string;
   public
     procedure CopyAppFiles(const AModel: TProjectModel);
+    procedure AddScriptFile(const AModel: TProjectModel; const AFileName: string;
+      const AStream: TStream);
     procedure UpdateManifest(const AModel: TProjectModel);
     function BuildApk(const AProjectModel: TProjectModel;
       const AEnvironmentModel: TEnvironmentModel): boolean;
@@ -44,6 +47,13 @@ function TAppService.GetApkPath(const AAppName: string): string;
 begin
   Result := TPath.Combine(GetAppPath(AAppName), 'bin');
   Result := TPath.Combine(Result, ChangeFileExt(AAppName, '.apk'));
+end;
+
+function TAppService.GetAppAssetsInternal(const AAppName: string): string;
+begin
+  Result := GetAppPath(AAppName);
+  Result := TPath.Combine(Result, 'assets');
+  Result := TPath.Combine(Result, 'internal');
 end;
 
 function TAppService.GetAppPath(const AAppName: string): string;
@@ -149,6 +159,22 @@ begin
 end;
 
 { TPreBuiltCopyService }
+
+procedure TAppService.AddScriptFile(const AModel: TProjectModel;
+  const AFileName: string; const AStream: TStream);
+var
+  LBytes: TBytes;
+begin
+  var LScriptFolder := GetAppAssetsInternal(AModel.ApplicationName);
+  if not TDirectory.Exists(LScriptFolder) then
+    raise Exception.CreateFmt('Script folder not found at: %s', [LScriptFolder]);
+
+  SetLength(LBytes, AStream.Size);
+  AStream.Position := 0;
+  AStream.Read(LBytes, AStream.Size);
+  var LFilePath := TPath.Combine(LScriptFolder, AFileName);
+  TFile.WriteAllBytes(LFilePath, LBytes);
+end;
 
 function TAppService.BuildApk(const AProjectModel: TProjectModel;
   const AEnvironmentModel: TEnvironmentModel): boolean;
