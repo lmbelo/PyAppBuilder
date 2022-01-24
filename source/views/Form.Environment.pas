@@ -27,6 +27,13 @@ type
     edtZipAlign: TEdit;
     ListBoxItem7: TListBoxItem;
     edtKeyTool: TEdit;
+    lblSdkBasePath: TLabel;
+    lblJarSigner: TLabel;
+    lblAdb: TLabel;
+    lblAapt: TLabel;
+    lblSdkApi: TLabel;
+    lblZipAlign: TLabel;
+    lblKeyTool: TLabel;
   protected
     procedure FormUpdate(); override;
     procedure ModelUpdate(); override;

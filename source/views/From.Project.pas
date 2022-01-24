@@ -30,6 +30,10 @@ type
     ListBoxGroupHeader5: TListBoxGroupHeader;
     ListBoxItem6: TListBoxItem;
     edtAppName: TEdit;
+    lblVersionCode: TLabel;
+    lblVersionName: TLabel;
+    lblPackageName: TLabel;
+    lblPythonVersion: TLabel;
   protected
     procedure FormUpdate(); override;
     procedure ModelUpdate(); override;
@@ -73,7 +77,9 @@ begin
     ApplicationName := edtAppName.Text;
     PackageName := edtPackageName.Text;
     if TryStrToInt(edtVersionCode.Text, LInt) then
-      VersionCode := LInt;
+      VersionCode := LInt
+    else
+      VersionCode := 0;
     VersionName := edtVersionName.Text;
     PythonVersion := PY_VER[cbPythonVersion.ItemIndex];
     Architecture := ARCH[cbArchitecture.ItemIndex];
