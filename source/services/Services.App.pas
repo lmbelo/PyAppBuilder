@@ -12,7 +12,10 @@ type
     function GetPreBuiltFolder(const AArchitecture: TArchitecture): string;
     function GetPythonZipFile(const APythonVersion: TPythonVersion;
       const AArchitecture: TArchitecture): string;
+    function GetPythonInterpreterFile(const APythonVersion: TPythonVersion;
+      const AArchitecture: TArchitecture): string;
     function GetAppPythonFolder(): string;
+    function GetAppPythonInterpreterFolder(const AArchitecture: TArchitecture): string;
     function GetApkPath(const AAppName: string): string;
     function GetManifestPath(const AAppName: string): string;
     function GetAppPath(const AAppName: string): string;
@@ -54,6 +57,15 @@ begin
   Result := TPath.Combine('assets', 'internal');
 end;
 
+function TAppService.GetAppPythonInterpreterFolder(const AArchitecture: TArchitecture): string;
+begin
+  Result := TPath.Combine('library', 'lib');
+  case AArchitecture of
+    arm: TPath.Combine(Result, 'armeabi-v7a');
+    aarch64: TPath.Combine(Result, 'arm64-v8a');
+  end;
+end;
+
 function TAppService.GetManifestPath(const AAppName: string): string;
 begin
   Result := TPath.Combine(GetAppPath(AAppName), 'AndroidManifest.xml');
@@ -69,6 +81,23 @@ begin
     aarch64: Result := TPath.Combine(Result, 'aarch64');
   end;
   Result := TPath.Combine(Result, APP_IMAGE_NAME);
+end;
+
+function TAppService.GetPythonInterpreterFile(
+  const APythonVersion: TPythonVersion;
+  const AArchitecture: TArchitecture): string;
+begin
+  Result := TPath.Combine(ExtractFilePath(ParamStr(0)), 'python');
+  case AArchitecture of
+    arm: Result := TPath.Combine(Result, 'arm');
+    aarch64: Result := TPath.Combine(Result, 'aarch64');
+  end;
+
+  case APythonVersion of
+    cp38: Result := TPath.Combine(TPath.Combine(Result, 'python3.8'), 'libpython3.8.so');
+    cp39: Result := TPath.Combine(TPath.Combine(Result, 'python3.9'), 'libpython3.9.so');
+    cp310: Result := TPath.Combine(TPath.Combine(Result, 'python3.10'), 'libpython3.10.so');
+  end;
 end;
 
 function TAppService.GetPythonZipFile(
@@ -156,6 +185,7 @@ begin
 
   //Copy python zip to the target app python's path
   var LAppPythonPath := TPath.Combine(LAppPath, GetAppPythonFolder());
+
   //Create the /assets/internal/ folder
   if not TDirectory.Exists(LAppPythonPath) then
     TDirectory.CreateDirectory(LAppPythonPath);
@@ -165,7 +195,21 @@ begin
   if TFile.Exists(LAppPythonPath) then
     TFile.Delete(LAppPythonPath);
 
+   //Copy the python zip to the app assets/internal/
   TFile.Copy(LPythonZipFile, LAppPythonPath);
+
+  //Get the python interpreter shared lib place
+  var LPythonInterpreterFile := GetPythonInterpreterFile(AModel.PythonVersion, AModel.Architecture);
+
+  //Copy the python interpreter to the app lib
+  var LAppPythonInterpreterPath := TPath.Combine(LAppPath, GetAppPythonInterpreterFolder(AModel.Architecture));
+
+  //Create the /library/lib/ folder
+  if not TDirectory.Exists(LAppPythonInterpreterPath) then
+    TDirectory.CreateDirectory(LAppPythonInterpreterPath);
+
+  //Copy the python interpreter to the app library/lib/{arch}
+  TFile.Copy(LPythonInterpreterFile, LAppPythonInterpreterPath);
 end;
 
 end.
