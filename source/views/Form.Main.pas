@@ -96,6 +96,8 @@ begin
   if cbDevice.ItemIndex < 0 then
     raise Exception.Create('Select a device.');
 
+  mmLog.Lines.Clear();
+
   var LAppService := TServiceSimpleFactory.CreateApp();
   var LProjectStorage := TDefaultStorage<TProjectModel>.Make();
   var LProjectModel: TProjectModel := nil;
