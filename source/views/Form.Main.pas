@@ -121,15 +121,16 @@ begin
 
   LAppService.CopyAppFiles(LProjectModel);
   LAppService.UpdateManifest(LProjectModel);
-  LAppService.BuildApk(LProjectModel, LEnvironmentModel);
-  LAppService.InstallApk(LProjectModel, LEnvironmentModel);
+  if LAppService.BuildApk(LProjectModel, LEnvironmentModel) then begin
+    LAppService.InstallApk(LProjectModel, LEnvironmentModel);
 
-  var LAdbService := TServiceSimpleFactory.CreateAdb();
-  var LResult := TStringList.Create();
-  try
-    LAdbService.RunApp(LEnvironmentModel.AdbLocation, LProjectModel.PackageName, LResult);
-  finally
-    LResult.Free();
+    var LAdbService := TServiceSimpleFactory.CreateAdb();
+    var LResult := TStringList.Create();
+    try
+      LAdbService.RunApp(LEnvironmentModel.AdbLocation, LProjectModel.PackageName, LResult);
+    finally
+      LResult.Free();
+    end;
   end;
 end;
 

@@ -19,8 +19,8 @@ type
     procedure InstallApk(const AAdbPath: string; const AApkPath: string; const AResult: TStrings);
     procedure RunApp(const AAdbPath, APkgName: string; const AResult: TStrings);
 
-    procedure BuildApk(const AAppBasePath, AAppName: string;
-      const AEnvironmentModel: TEnvironmentModel; const AResult: TStrings);
+    function BuildApk(const AAppBasePath, AAppName: string;
+      const AEnvironmentModel: TEnvironmentModel; const AResult: TStrings): boolean;
   end;
 
 implementation
@@ -35,8 +35,8 @@ uses
 
 { TADBService }
 
-procedure TADBService.BuildApk(const AAppBasePath, AAppName: string;
-  const AEnvironmentModel: TEnvironmentModel; const AResult: TStrings);
+function TADBService.BuildApk(const AAppBasePath, AAppName: string;
+  const AEnvironmentModel: TEnvironmentModel; const AResult: TStrings): boolean;
 const
   CMD_1 = '$AAPT package -f -m -J . -M AndroidManifest.xml -S res -I $ANDROIDJAR';
 
@@ -122,6 +122,10 @@ begin
     .Replace('$APPNAME', AAppName);
 
   ExecCmd(LCmd, AAppBasePath, AResult);
+
+  var LApkPath := TPath.Combine(TPath.Combine(AAppBasePath, 'bin'), ChangeFileExt(AAppName, '.apk'));
+  Result := TFile.Exists(LApkPath)
+    and not AResult.Text.Contains('Failure');
 end;
 
 procedure TADBService.EnumAssets(const AAssetsBasePath: string;

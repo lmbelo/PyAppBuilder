@@ -22,8 +22,8 @@ type
   public
     procedure CopyAppFiles(const AModel: TProjectModel);
     procedure UpdateManifest(const AModel: TProjectModel);
-    procedure BuildApk(const AProjectModel: TProjectModel;
-      const AEnvironmentModel: TEnvironmentModel);
+    function BuildApk(const AProjectModel: TProjectModel;
+      const AEnvironmentModel: TEnvironmentModel): boolean;
     procedure InstallApk(const AProjectModel: TProjectModel;
       const AEnvironmentModel: TEnvironmentModel);    
   end;
@@ -61,8 +61,8 @@ function TAppService.GetAppPythonInterpreterFolder(const AArchitecture: TArchite
 begin
   Result := TPath.Combine('library', 'lib');
   case AArchitecture of
-    arm: TPath.Combine(Result, 'armeabi-v7a');
-    aarch64: TPath.Combine(Result, 'arm64-v8a');
+    arm: Result := TPath.Combine(Result, 'armeabi-v7a');
+    aarch64: Result := TPath.Combine(Result, 'arm64-v8a');
   end;
 end;
 
@@ -150,13 +150,13 @@ end;
 
 { TPreBuiltCopyService }
 
-procedure TAppService.BuildApk(const AProjectModel: TProjectModel;
-  const AEnvironmentModel: TEnvironmentModel);
+function TAppService.BuildApk(const AProjectModel: TProjectModel;
+  const AEnvironmentModel: TEnvironmentModel): boolean;
 begin
   var LService := TServiceSimpleFactory.CreateAdb();
   var LStrings := TStringList.Create();
   try
-    LService.BuildApk(GetAppPath(AProjectModel.ApplicationName), 
+    Result := LService.BuildApk(GetAppPath(AProjectModel.ApplicationName),
       AProjectModel.ApplicationName, AEnvironmentModel, LStrings);
   finally
     LStrings.Free();
@@ -165,6 +165,7 @@ end;
 
 procedure TAppService.CopyAppFiles(const AModel: TProjectModel);
 begin
+  {|||||| APP folder ||||||}
   var LAppPath := GetAppPath(AModel.ApplicationName);
 
   if TDirectory.Exists(LAppPath) then
@@ -172,41 +173,51 @@ begin
 
   TDirectory.CreateDirectory(LAppPath);
 
+  {|||||| Pre-build APP folder ||||||}
+
   var LPreBuiltFolder := GetPreBuiltFolder(AModel.Architecture);
   if not TDirectory.Exists(LPreBuiltFolder) then
     raise Exception.CreateFmt('Pre-built folder not found at: %s', [LPreBuiltFolder]);
+
+  //Copy the app image to the target app path
+  TDirectory.Copy(LPreBuiltFolder, LAppPath);
+
+  {|||||| Python distribution zip file ||||||}
 
   var LPythonZipFile := GetPythonZipFile(AModel.PythonVersion, AModel.Architecture);
   if not TFile.Exists(LPythonZipFile) then
     raise Exception.CreateFmt('Python zip file not found at: %s', [LPythonZipFile]);
 
-  //Copy the app image to the target app path
-  TDirectory.Copy(LPreBuiltFolder, LAppPath);
-
   //Copy python zip to the target app python's path
-  var LAppPythonPath := TPath.Combine(LAppPath, GetAppPythonFolder());
+  var LAppPythonFolder := TPath.Combine(LAppPath, GetAppPythonFolder());
 
   //Create the /assets/internal/ folder
-  if not TDirectory.Exists(LAppPythonPath) then
-    TDirectory.CreateDirectory(LAppPythonPath);
+  if not TDirectory.Exists(LAppPythonFolder) then
+    TDirectory.CreateDirectory(LAppPythonFolder);
 
-  LAppPythonPath := TPath.Combine(LAppPythonPath, ExtractFileName(LPythonZipFile));
+  var LAppPythonPath := TPath.Combine(LAppPythonFolder, ExtractFileName(LPythonZipFile));
 
   if TFile.Exists(LAppPythonPath) then
     TFile.Delete(LAppPythonPath);
 
-   //Copy the python zip to the app assets/internal/
+  //Copy the python zip to the app assets/internal/
   TFile.Copy(LPythonZipFile, LAppPythonPath);
+
+  {|||||| Python Interpreter ||||||}
 
   //Get the python interpreter shared lib place
   var LPythonInterpreterFile := GetPythonInterpreterFile(AModel.PythonVersion, AModel.Architecture);
+  if not TFile.Exists(LPythonInterpreterFile) then
+    raise Exception.CreateFmt('Python interpreter shared library file not found at: %s', [LPythonInterpreterFile]);
 
   //Copy the python interpreter to the app lib
-  var LAppPythonInterpreterPath := TPath.Combine(LAppPath, GetAppPythonInterpreterFolder(AModel.Architecture));
+  var LAppPythonInterpreterFolder := TPath.Combine(LAppPath, GetAppPythonInterpreterFolder(AModel.Architecture));
 
   //Create the /library/lib/ folder
-  if not TDirectory.Exists(LAppPythonInterpreterPath) then
-    TDirectory.CreateDirectory(LAppPythonInterpreterPath);
+  if not TDirectory.Exists(LAppPythonInterpreterFolder) then
+    TDirectory.CreateDirectory(LAppPythonInterpreterFolder);
+
+  var LAppPythonInterpreterPath := TPath.Combine(LAppPythonInterpreterFolder, ExtractFileName(LPythonInterpreterFile));
 
   //Copy the python interpreter to the app library/lib/{arch}
   TFile.Copy(LPythonInterpreterFile, LAppPythonInterpreterPath);
