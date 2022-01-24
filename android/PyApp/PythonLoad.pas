@@ -37,6 +37,7 @@ type
   TExtractEvent = reference to procedure(const AFolderExists: boolean; var AReplaceFiles: boolean);
   TPythonLoad = class
   public
+    class function FindPythonVer(): integer; static;
     class function GetPyZip(): string; static;
     class function GetPyRoot(): string; static;
     class function GetPyHome(): string; static;
@@ -57,9 +58,6 @@ uses
   System.IOUtils,
   Androidapi.Helpers,
   Androidapi.JNI.JavaTypes;
-
-const
-  PY_KNOWN_VER = 7;
 
 { TPythonLoad }
 
@@ -84,6 +82,18 @@ begin
     raise Exception.Create('Python compressed distribution not found.');
 
   TZipFile.ExtractZipFile(LPyZip, LPyRoot, AZipProgress);
+end;
+
+class function TPythonLoad.FindPythonVer: integer;
+begin
+  if TFile.Exists(TPath.Combine(TPath.GetLibraryPath(), 'libpython3.8.so')) then
+    Result := 6
+  else if TFile.Exists(TPath.Combine(TPath.GetLibraryPath(), 'libpython3.9.so')) then
+    Result := 7
+  else if TFile.Exists(TPath.Combine(TPath.GetLibraryPath(), 'libpython3.10.so')) then
+    Result := 8
+  else
+    raise Exception.Create('Python shared library not found');
 end;
 
 class function TPythonLoad.GetPyBin: string;
@@ -124,9 +134,11 @@ end;
 class procedure TPythonLoad.Configure(const APythonEngine: TPythonEngine;
   const ACheckPyLib: boolean);
 begin
+  var LPythonVer := FindPythonVer();
+
   if ACheckPyLib then begin
     var LPyLibFile := TPath.Combine(TPath.GetLibraryPath(),
-      PYTHON_KNOWN_VERSIONS[PY_KNOWN_VER].DllName);
+      PYTHON_KNOWN_VERSIONS[LPythonVer].DllName);
 
     if not TFile.Exists(LPyLibFile) then
       raise Exception.Create('Python library not found at application''s data folder.'
@@ -137,9 +149,9 @@ begin
   APythonEngine.UseLastKnownVersion := false;
   APythonEngine.ProgramName := TPythonLoad.GetPyBin();
   APythonEngine.PythonHome := TPythonLoad.GetPyHome();
-  APythonEngine.RegVersion := PYTHON_KNOWN_VERSIONS[PY_KNOWN_VER].RegVersion;
-  APythonEngine.DllName := PYTHON_KNOWN_VERSIONS[PY_KNOWN_VER].DllName;
-  APythonEngine.APIVersion := PYTHON_KNOWN_VERSIONS[PY_KNOWN_VER].APIVersion;
+  APythonEngine.RegVersion := PYTHON_KNOWN_VERSIONS[LPythonVer].RegVersion;
+  APythonEngine.DllName := PYTHON_KNOWN_VERSIONS[LPythonVer].DllName;
+  APythonEngine.APIVersion := PYTHON_KNOWN_VERSIONS[LPythonVer].APIVersion;
 end;
 
 end.

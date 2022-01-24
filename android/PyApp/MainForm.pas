@@ -37,7 +37,7 @@ uses
   FMX.Ani, FMX.StdCtrls, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo,
   PythonEngine, FMX.PythonGUIInputOutput, System.Actions, FMX.ActnList,
   FMX.Objects, FMX.Layouts, FMX.Platform, AppEnvironment, ProgressFrame,
-  System.Threading, FMX.ListBox, WrapDelphi;
+  System.Threading, FMX.ListBox, WrapDelphi, WrapDelphiFMX;
 
 type
   TPyMainForm = class(TForm)
@@ -51,6 +51,11 @@ type
     PythonModule1: TPythonModule;
     tbBottom: TToolBar;
     btnRun: TButton;
+    mmMainScript: TMemo;
+    mmOutput: TMemo;
+    spInputOutput: TSplitter;
+    RoundRect1: TRoundRect;
+    PythonGUIInputOutput1: TPythonGUIInputOutput;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure actRunExecute(Sender: TObject);
@@ -60,6 +65,7 @@ type
     procedure ConfigurePython();
     procedure DisableComponents();
     procedure EnableComponents();
+    procedure TryLoadingMainScript();
   public
     { Public declarations }
   end;
@@ -96,10 +102,16 @@ begin
   FAppEnv.Free();
 end;
 
-procedure TPyMainForm.actRunExecute(Sender: TObject);
+procedure TPyMainForm.TryLoadingMainScript;
 begin
   var LScript := TPath.Combine(TPath.GetDocumentsPath(), 'main.py');
-  PythonEngine1.ExecString(AnsiString(TFile.ReadAllText(LScript)));
+  if TFile.Exists(LScript) then
+    mmMainScript.Lines.LoadFromFile(LScript);
+end;
+
+procedure TPyMainForm.actRunExecute(Sender: TObject);
+begin
+  PythonEngine1.ExecString(AnsiString(mmMainScript.Lines.Text));
 end;
 
 function TPyMainForm.AppEventHandler(AAppEvent: TApplicationEvent;
@@ -117,9 +129,10 @@ begin
     procedure(const AInitialized: boolean; const ALastErrorMsg: string) begin
       TThread.Synchronize(nil,
         procedure begin
-          if AInitialized then
-            EnableComponents()
-          else
+          if AInitialized then begin
+            TryLoadingMainScript();
+            EnableComponents();
+          end else
             ShowMessage(ALastErrorMsg);
         end);
     end);

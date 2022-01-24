@@ -119,8 +119,9 @@ begin
     LModelErrors.Free();
   end;
 
+  //Copy Python and other APP files
   LAppService.CopyAppFiles(LProjectModel);
-
+  //Save the main.py script to the APP files
   var LStream := TMemoryStream.Create();
   try
     mmEditor.Lines.SaveToStream(LStream);
@@ -128,9 +129,11 @@ begin
   finally
     LStream.Free();
   end;
-
+  //Update the manifest with the custom APP settings
   LAppService.UpdateManifest(LProjectModel);
+  //Create and sign the APK file
   if LAppService.BuildApk(LProjectModel, LEnvironmentModel) then begin
+    //Install the APK on the device
     LAppService.InstallApk(LProjectModel, LEnvironmentModel);
 
     var LAdbService := TServiceSimpleFactory.CreateAdb();

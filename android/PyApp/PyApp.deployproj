@@ -166,15 +166,14 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Debug\libPyApp.so" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PyApp\library\lib\arm64-v8a\</RemoteDir>
-            <RemoteName>libPyApp.so</RemoteName>
-            <DeployClass>ProjectOutput</DeployClass>
-            <Operation>1</Operation>
+        <DeployFile Include="Android64\Debug\PyApp.classes" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PyApp\classes\</RemoteDir>
+            <RemoteName>PyApp.classes</RemoteName>
+            <DeployClass>AndroidClasses</DeployClass>
+            <Operation>64</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
-            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="Android64\Release\styles-v21.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>PyApp\res\values-v21\</RemoteDir>
@@ -221,7 +220,16 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Release\libPyApp.so" Condition="'$(Config)'=='Release'">
+        <DeployFile Include="Android64\Release\PyApp.classes" Condition="'$(Config)'=='Release'">
+            <RemoteDir>PyApp\classes\</RemoteDir>
+            <RemoteName>PyApp.classes</RemoteName>
+            <DeployClass>AndroidClasses</DeployClass>
+            <Operation>64</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android64\Debug\libPyApp.so" Condition="'$(Config)'=='Debug'">
             <RemoteDir>PyApp\library\lib\arm64-v8a\</RemoteDir>
             <RemoteName>libPyApp.so</RemoteName>
             <DeployClass>ProjectOutput</DeployClass>
@@ -294,14 +302,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Release\PyApp.classes" Condition="'$(Config)'=='Release'">
-            <RemoteDir>PyApp\classes\</RemoteDir>
-            <RemoteName>PyApp.classes</RemoteName>
-            <DeployClass>AndroidClasses</DeployClass>
-            <Operation>64</Operation>
+        <DeployFile Include="Android64\Release\libPyApp.so" Condition="'$(Config)'=='Release'">
+            <RemoteDir>PyApp\library\lib\arm64-v8a\</RemoteDir>
+            <RemoteName>libPyApp.so</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
+            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="Android64\Debug\colors.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>PyApp\res\values\</RemoteDir>
@@ -461,15 +470,6 @@
             <RemoteName>ic_notification.png</RemoteName>
             <DeployClass>Android_NotificationIcon72</DeployClass>
             <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android64\Debug\PyApp.classes" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PyApp\classes\</RemoteDir>
-            <RemoteName>PyApp.classes</RemoteName>
-            <DeployClass>AndroidClasses</DeployClass>
-            <Operation>64</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -638,15 +638,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Release\PyApp.classes" Condition="'$(Config)'=='Release'">
-            <RemoteDir>PyApp\classes\</RemoteDir>
-            <RemoteName>PyApp.classes</RemoteName>
-            <DeployClass>AndroidClasses</DeployClass>
-            <Operation>64</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>PyApp\res\drawable-xhdpi\</RemoteDir>
             <RemoteName>ic_notification.png</RemoteName>
@@ -737,15 +728,14 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Debug\libPyApp.so" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PyApp\library\lib\armeabi-v7a\</RemoteDir>
-            <RemoteName>libPyApp.so</RemoteName>
-            <DeployClass>ProjectOutput</DeployClass>
-            <Operation>1</Operation>
+        <DeployFile Include="Android\Debug\PyApp.classes" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PyApp\classes\</RemoteDir>
+            <RemoteName>PyApp.classes</RemoteName>
+            <DeployClass>AndroidClasses</DeployClass>
+            <Operation>64</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
-            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="Android\Release\colors.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>PyApp\res\values\</RemoteDir>
@@ -774,16 +764,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Release\libPyApp.so" Condition="'$(Config)'=='Release'">
-            <RemoteDir>PyApp\library\lib\armeabi-v7a\</RemoteDir>
-            <RemoteName>libPyApp.so</RemoteName>
-            <DeployClass>ProjectOutput</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-            <Required>True</Required>
-        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>PyApp\res\drawable-xxxhdpi\</RemoteDir>
             <RemoteName>ic_notification.png</RemoteName>
@@ -798,6 +778,15 @@
             <RemoteName>ic_notification.png</RemoteName>
             <DeployClass>Android_NotificationIcon96</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android\Release\PyApp.classes" Condition="'$(Config)'=='Release'">
+            <RemoteDir>PyApp\classes\</RemoteDir>
+            <RemoteName>PyApp.classes</RemoteName>
+            <DeployClass>AndroidClasses</DeployClass>
+            <Operation>64</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -820,11 +809,11 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Debug\PyApp.classes" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PyApp\classes\</RemoteDir>
-            <RemoteName>PyApp.classes</RemoteName>
-            <DeployClass>AndroidClasses</DeployClass>
-            <Operation>64</Operation>
+        <DeployFile Include="$(NDKBasePath)\prebuilt\android-arm\gdbserver\gdbserver" Condition="'$(Config)'=='Release'">
+            <RemoteDir>PyApp\library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>gdbserver</RemoteName>
+            <DeployClass>AndroidGDBServer</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -860,15 +849,6 @@
             <RemoteDir>PyApp\res\drawable-xxhdpi\</RemoteDir>
             <RemoteName>ic_notification.png</RemoteName>
             <DeployClass>Android_NotificationIcon72</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="$(NDKBasePath)\prebuilt\android-arm\gdbserver\gdbserver" Condition="'$(Config)'=='Release'">
-            <RemoteDir>PyApp\library\lib\armeabi-v7a\</RemoteDir>
-            <RemoteName>gdbserver</RemoteName>
-            <DeployClass>AndroidGDBServer</DeployClass>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -910,6 +890,16 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Debug\libPyApp.so" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PyApp\library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libPyApp.so</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>PyApp\res\drawable-xhdpi\</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
@@ -945,6 +935,16 @@
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android\Release\libPyApp.so" Condition="'$(Config)'=='Release'">
+            <RemoteDir>PyApp\library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libPyApp.so</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="Android\Release\AndroidManifest.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>PyApp\</RemoteDir>

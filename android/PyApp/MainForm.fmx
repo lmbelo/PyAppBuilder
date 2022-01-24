@@ -38066,8 +38066,48 @@ object PyMainForm: TPyMainForm
       TabOrder = 0
     end
   end
+  object mmMainScript: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Client
+    Size.Width = 360.000000000000000000
+    Size.Height = 518.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    Viewport.Width = 352.000000000000000000
+    Viewport.Height = 510.000000000000000000
+  end
+  object mmOutput: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Top
+    Position.Y = 48.000000000000000000
+    Size.Width = 360.000000000000000000
+    Size.Height = 121.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 8
+    Viewport.Width = 352.000000000000000000
+    Viewport.Height = 113.000000000000000000
+  end
+  object spInputOutput: TSplitter
+    Align = Top
+    Cursor = crVSplit
+    MinSize = 20.000000000000000000
+    Position.Y = 169.000000000000000000
+    Size.Width = 360.000000000000000000
+    Size.Height = 8.000000000000000000
+    Size.PlatformDefault = False
+    object RoundRect1: TRoundRect
+      Align = Center
+      HitTest = False
+      Size.Width = 40.000000000000000000
+      Size.Height = 8.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
   object PythonEngine1: TPythonEngine
     AutoLoad = False
+    IO = PythonGUIInputOutput1
     Left = 98
     Top = 480
   end
@@ -38091,5 +38131,12 @@ object PyMainForm: TPyMainForm
     Errors = <>
     Left = 104
     Top = 536
+  end
+  object PythonGUIInputOutput1: TPythonGUIInputOutput
+    UnicodeIO = True
+    RawOutput = False
+    Output = mmOutput
+    Left = 120
+    Top = 649
   end
 end

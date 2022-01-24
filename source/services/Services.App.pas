@@ -20,6 +20,9 @@ type
     function GetManifestPath(const AAppName: string): string;
     function GetAppPath(const AAppName: string): string;
     function GetAppAssetsInternal(const AAppName: string): string;
+    function GetAppDeployInfoFolder(const AAppName: string): string;
+    procedure ClearDeployInfo(const AAppName: string);
+    procedure AddAssetsInternalFileToDeployInfo(const AAppName: string; const AFileName: string);
   public
     procedure CopyAppFiles(const AModel: TProjectModel);
     procedure AddScriptFile(const AModel: TProjectModel; const AFileName: string;
@@ -54,6 +57,13 @@ begin
   Result := GetAppPath(AAppName);
   Result := TPath.Combine(Result, 'assets');
   Result := TPath.Combine(Result, 'internal');
+end;
+
+function TAppService.GetAppDeployInfoFolder(const AAppName: string): string;
+begin
+  Result := GetAppPath(AAppName);
+  Result := TPath.Combine(Result, 'assets');
+  Result := TPath.Combine(Result, 'deployinfo');
 end;
 
 function TAppService.GetAppPath(const AAppName: string): string;
@@ -160,6 +170,28 @@ end;
 
 { TPreBuiltCopyService }
 
+procedure TAppService.AddAssetsInternalFileToDeployInfo(
+  const AAppName: string; const AFileName: string);
+begin
+  var LDeployInfoFolder := GetAppDeployInfoFolder(AAppName);
+  if not TDirectory.Exists(LDeployInfoFolder) then
+    TDirectory.CreateDirectory(LDeployInfoFolder);
+
+  var LDelpoyedDataSetsFile := TPath.Combine(LDeployInfoFolder, 'deployedassets.txt');
+  if not TFile.Exists(LDelpoyedDataSetsFile) then
+    TFile.Create(LDelpoyedDataSetsFile).Free();
+
+  var LDeployedFilePath := '.\assets\internal\' + AFileName;
+
+  var LContent := TFile.ReadAllText(LDelpoyedDataSetsFile);
+
+  if not LContent.IsEmpty() then
+    TFile.AppendAllText(LDelpoyedDataSetsFile, sLineBreak);
+
+  if not LContent.Contains(LDeployedFilePath) then
+    TFile.AppendAllText(LDelpoyedDataSetsFile, LDeployedFilePath);
+end;
+
 procedure TAppService.AddScriptFile(const AModel: TProjectModel;
   const AFileName: string; const AStream: TStream);
 var
@@ -174,6 +206,8 @@ begin
   AStream.Read(LBytes, AStream.Size);
   var LFilePath := TPath.Combine(LScriptFolder, AFileName);
   TFile.WriteAllBytes(LFilePath, LBytes);
+
+  AddAssetsInternalFileToDeployInfo(AModel.ApplicationName, AFileName);
 end;
 
 function TAppService.BuildApk(const AProjectModel: TProjectModel;
@@ -187,6 +221,14 @@ begin
   finally
     LStrings.Free();
   end;
+end;
+
+procedure TAppService.ClearDeployInfo(const AAppName: string);
+begin
+  var LDeployInfoFolder := GetAppDeployInfoFolder(AAppName);
+  var LDelpoyedDataSetsFile := TPath.Combine(LDeployInfoFolder, 'deployedassets.txt');
+  if TFile.Exists(LDelpoyedDataSetsFile) then
+    TFile.Delete(LDelpoyedDataSetsFile);
 end;
 
 procedure TAppService.CopyAppFiles(const AModel: TProjectModel);
@@ -208,6 +250,8 @@ begin
   //Copy the app image to the target app path
   TDirectory.Copy(LPreBuiltFolder, LAppPath);
 
+  ClearDeployInfo(AModel.ApplicationName);
+
   {|||||| Python distribution zip file ||||||}
 
   var LPythonZipFile := GetPythonZipFile(AModel.PythonVersion, AModel.Architecture);
@@ -228,6 +272,8 @@ begin
 
   //Copy the python zip to the app assets/internal/
   TFile.Copy(LPythonZipFile, LAppPythonPath);
+
+  AddAssetsInternalFileToDeployInfo(AModel.ApplicationName, ExtractFileName(LPythonZipFile));
 
   {|||||| Python Interpreter ||||||}
 
