@@ -8,7 +8,7 @@ uses
   FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.Layouts, FMX.ListBox,
   FMX.StdCtrls, FMX.TabControl, System.Actions, FMX.ActnList, FMX.Ani,
   FMX.Objects, Form.Base, Services, Storage.Factory, Storage.Default,
-  Model.Project, Model.Environment;
+  Model.Project, Model.Environment, Model;
 
 type
   TMainForm = class(TBaseForm, IServices, ILogServices)
@@ -96,11 +96,28 @@ begin
   var LEnvironmentStorage := TDefaultStorage<TEnvironmentModel>.Make();
   var LEnvironmentModel: TEnvironmentModel := nil;
 
-  if not LProjectStorage.LoadModel(LProjectModel) then
-    raise Exception.Create('Application defs not set.');
-
   if not LEnvironmentStorage.LoadModel(LEnvironmentModel) then
-    raise Exception.Create('Environment defs not set.');
+    raise Exception.Create('The Environment Settings are empty.');
+
+  if not LProjectStorage.LoadModel(LProjectModel) then
+    raise Exception.Create('The Project Settings are empty.');
+
+  var LModelErrors := TStringList.Create();
+  try
+    if not LEnvironmentModel.Validate(LModelErrors) then
+      raise EModelValidationError.Create('The Environment Settings has invalid arguments:'
+        + sLineBreak
+        + sLineBreak
+        + LModelErrors.Text);
+
+    if not LProjectModel.Validate(LModelErrors) then
+      raise EModelValidationError.Create('The Project Settings has invalid arguments:'
+        + sLineBreak
+        + sLineBreak
+        + LModelErrors.Text);
+  finally
+    LModelErrors.Free();
+  end;
 
   LAppService.CopyAppFiles(LProjectModel);
   LAppService.UpdateManifest(LProjectModel);
