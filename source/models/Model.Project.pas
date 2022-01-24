@@ -3,11 +3,11 @@ unit Model.Project;
 interface
 
 uses
-  REST.Json.Types, Model, Architecture, PythonVersion;
+  System.Classes, REST.Json.Types, Model, Architecture, PythonVersion;
 
 type
   [Model('project')]
-  TProjectModel = class
+  TProjectModel = class(TModel)
   private
     [JSONName('application_name')]
     FApplicationName: string;
@@ -22,6 +22,8 @@ type
     [JSONName('architecture')]
     FArchitecture: TArchitecture;
   public
+    function Validate(const AErrors: TStrings): boolean; override;
+  public
     property ApplicationName: string read FApplicationName write FApplicationName;
     property PackageName: string read FPackageName write FPackageName;
     property VersionCode: integer read FVersionCode write FVersionCode;
@@ -31,5 +33,30 @@ type
   end;
 
 implementation
+
+uses
+  System.SysUtils;
+
+{ TProjectModel }
+
+function TProjectModel.Validate(const AErrors: TStrings): boolean;
+begin
+  AErrors.Clear();
+
+  {|||||| CHECK FOR PATHS |||||||}
+  if FApplicationName.Trim().IsEmpty() then
+    AErrors.Add('* The Application Name can not be empty.');
+
+  if FPackageName.Trim().IsEmpty() then
+    AErrors.Add('* The Package Name can not be empty.');
+
+  if FVersionCode <= 0 then
+    AErrors.Add('* The Version Code must be greater than 0.');
+
+  if FVersionName.Trim().IsEmpty() then
+    AErrors.Add('* The Version Name can not be empty.');
+
+  Result := (AErrors.Count = 0);
+end;
 
 end.
