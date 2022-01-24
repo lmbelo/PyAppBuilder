@@ -150,14 +150,14 @@ inherited MainForm: TMainForm
         TabOrder = 0
         Text = 'Environ.'
       end
-      object ListBoxItem1: TListBoxItem
+      object lbiEnvironment: TListBoxItem
         ImageIndex = 0
         Position.Y = 34.000000000000000000
         Size.Width = 50.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
-        OnClick = ListBoxItem1Click
+        OnClick = lbiEnvironmentClick
       end
       object ListBoxGroupHeader2: TListBoxGroupHeader
         TextSettings.HorzAlign = Center
@@ -169,14 +169,14 @@ inherited MainForm: TMainForm
         TabOrder = 4
         Text = 'Project'
       end
-      object ListBoxItem3: TListBoxItem
+      object lbiProject: TListBoxItem
         ImageIndex = 1
         Position.Y = 118.000000000000000000
         Size.Width = 50.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
-        OnClick = ListBoxItem3Click
+        OnClick = lbiProjectClick
       end
       object ListBoxGroupHeader3: TListBoxGroupHeader
         TextSettings.HorzAlign = Center
@@ -188,14 +188,14 @@ inherited MainForm: TMainForm
         TabOrder = 2
         Text = 'Launch'
       end
-      object ListBoxItem2: TListBoxItem
+      object lbiDeploy: TListBoxItem
         ImageIndex = 2
         Position.Y = 202.000000000000000000
         Size.Width = 50.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 3
-        OnClick = ListBoxItem2Click
+        OnClick = lbiDeployClick
       end
     end
   end

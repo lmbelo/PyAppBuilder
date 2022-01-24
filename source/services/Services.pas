@@ -21,9 +21,9 @@ type
     procedure ListDevices(const AAdbPath: string; const AStrings: TStrings);
     function BuildApk(const AAppBasePath, AAppName: string;
       const AEnvironmentModel: TEnvironmentModel; const AResult: TStrings): boolean;
-    procedure InstallApk(const AAdbPath: string; const AApkPath: string;
+    procedure InstallApk(const AAdbPath, AApkPath, ADevice: string;
       const AResult: TStrings);
-    procedure RunApp(const AAdbPath, APkgName: string; const AResult: TStrings);
+    procedure RunApp(const AAdbPath, APkgName, ADevice: string; const AResult: TStrings);
   end;
 
   IAppServices = interface
@@ -33,7 +33,7 @@ type
     function BuildApk(const AProjectModel: TProjectModel;
       const AEnvironmentModel: TEnvironmentModel): boolean;
     procedure InstallApk(const AProjectModel: TProjectModel;
-      const AEnvironmentModel: TEnvironmentModel);
+      const AEnvironmentModel: TEnvironmentModel; const ADevice: string);
     procedure AddScriptFile(const AModel: TProjectModel; const AFileName: string;
       const AStream: TStream);
   end;

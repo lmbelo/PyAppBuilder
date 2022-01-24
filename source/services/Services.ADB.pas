@@ -8,7 +8,7 @@ uses
 type
   TADBService = class(TInterfacedObject, IADBServices)
   private
-    procedure ExecCmd(const CmdLine, ABaseDir: string; CmdResult: TStrings);
+    procedure ExecCmd(const ACmdLine, ABaseDir: string; ACmdResult: TStrings);
     procedure EnumAssets(const AAssetsBasePath: string; const AProc: TProc<string>);
     procedure EnumLibraries(const ALibBasePath: string; const AProc: TProc<string>);
   private
@@ -16,8 +16,8 @@ type
     function FindDeviceVendorModel(const AAdbPath, ADevice: string): string;
   public
     procedure ListDevices(const AAdbPath: string; const AStrings: TStrings);
-    procedure InstallApk(const AAdbPath: string; const AApkPath: string; const AResult: TStrings);
-    procedure RunApp(const AAdbPath, APkgName: string; const AResult: TStrings);
+    procedure InstallApk(const AAdbPath, AApkPath, ADevice: string; const AResult: TStrings);
+    procedure RunApp(const AAdbPath, APkgName, ADevice: string; const AResult: TStrings);
 
     function BuildApk(const AAppBasePath, AAppName: string;
       const AEnvironmentModel: TEnvironmentModel; const AResult: TStrings): boolean;
@@ -187,16 +187,22 @@ begin
   end;
 end;
 
-procedure TADBService.ExecCmd(const CmdLine, ABaseDir: string; CmdResult: TStrings);
+procedure TADBService.ExecCmd(const ACmdLine, ABaseDir: string; ACmdResult: TStrings);
 begin
   var LLog: ILogServices := nil;
   if Supports(GlobalServices, ILogServices, LLog) then
-    LLog.Log('ExecCmd: ' + CmdLine);
+    LLog.Log('ExecCmd: ' + ACmdLine);
 
-  ExecCmdine(CmdLine, ABaseDir, CmdResult);
+  var LCmdResults := TStringList.Create();
+  try
+    ExecCmdine(ACmdLine, ABaseDir, LCmdResults);
+    ACmdResult.AddStrings(LCmdResults);
 
-  if Assigned(LLog) then
-    LLog.Log(CmdResult.Text);
+    if Assigned(LLog) then
+      LLog.Log(LCmdResults.Text);
+  finally
+    LCmdResults.Free();
+  end;
 end;
 
 function TADBService.FindDeviceVendorModel(const AAdbPath, ADevice: string): string;
@@ -211,11 +217,11 @@ begin
   end;
 end;
 
-procedure TADBService.InstallApk(const AAdbPath, AApkPath: string; const AResult: TStrings);
+procedure TADBService.InstallApk(const AAdbPath, AApkPath, ADevice: string; const AResult: TStrings);
 begin
   var LStrings := TStringList.Create();
   try
-    ExecCmd(AAdbPath + ' install -r ' + AApkPath, String.Empty, LStrings);
+    ExecCmd(AAdbPath + Format(' -s %s install -r ', [ADevice]) + AApkPath, String.Empty, LStrings);
   finally
     LStrings.Free();
   end;
@@ -227,19 +233,19 @@ begin
   try
     ExecCmd(AAdbPath + ' devices', String.Empty, LStrings);
     EnumDevices(LStrings, procedure(ADevice: string) begin
-      AStrings.Add(FindDeviceVendorModel(AAdbPath, ADevice));
+      AStrings.AddPair(ADevice, FindDeviceVendorModel(AAdbPath, ADevice));
     end);
   finally
     LStrings.Free();
   end;
 end;
 
-procedure TADBService.RunApp(const AAdbPath, APkgName: string;
+procedure TADBService.RunApp(const AAdbPath, APkgName, ADevice: string;
   const AResult: TStrings);
 begin
   ExecCmd(AAdbPath
-    + Format(' shell am start -n %s/com.embarcadero.firemonkey.FMXNativeActivity', [
-    APkgName]), String.Empty, AResult);
+    + Format(' -s %s shell am start -n %s/com.embarcadero.firemonkey.FMXNativeActivity', [
+        ADevice, APkgName]), String.Empty, AResult);
 end;
 
 end.

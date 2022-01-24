@@ -17,13 +17,13 @@ type
     pnlLeftMenu: TPanel;
     lbLeftMenu: TListBox;
     ListBoxGroupHeader1: TListBoxGroupHeader;
-    ListBoxItem1: TListBoxItem;
+    lbiEnvironment: TListBoxItem;
     ListBoxGroupHeader2: TListBoxGroupHeader;
-    ListBoxItem3: TListBoxItem;
+    lbiProject: TListBoxItem;
     tbScripts: TTabControl;
     tiMainScript: TTabItem;
     ListBoxGroupHeader3: TListBoxGroupHeader;
-    ListBoxItem2: TListBoxItem;
+    lbiDeploy: TListBoxItem;
     loDevice: TLayout;
     aiDevice: TAniIndicator;
     cbDevice: TComboBox;
@@ -33,14 +33,15 @@ type
     spLog: TSplitter;
     rrSpliterGrip: TRoundRect;
     mmLog: TMemo;
-    procedure ListBoxItem1Click(Sender: TObject);
-    procedure ListBoxItem3Click(Sender: TObject);
+    procedure lbiEnvironmentClick(Sender: TObject);
+    procedure lbiProjectClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnRefreshDeviceClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure ListBoxItem2Click(Sender: TObject);
+    procedure lbiDeployClick(Sender: TObject);
   private
+    FDevices: TStrings;
     procedure LoadDevices();
   public
     procedure Log(const AString: string);
@@ -64,12 +65,14 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  FDevices := TStringList.Create();
   GlobalServices := Self;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   GlobalServices := nil;
+  FDevices.Free();
 end;
 
 procedure TMainForm.FormShow(Sender: TObject);
@@ -77,7 +80,7 @@ begin
   LoadDevices();
 end;
 
-procedure TMainForm.ListBoxItem1Click(Sender: TObject);
+procedure TMainForm.lbiEnvironmentClick(Sender: TObject);
 begin
   var LForm := TFormSimpleFactory.CreateEnvironment();
   try
@@ -87,9 +90,12 @@ begin
   end;
 end;
 
-procedure TMainForm.ListBoxItem2Click(Sender: TObject);
+procedure TMainForm.lbiDeployClick(Sender: TObject);
 begin
   inherited;
+  if cbDevice.ItemIndex < 0 then
+    raise Exception.Create('Select a device.');
+
   var LAppService := TServiceSimpleFactory.CreateApp();
   var LProjectStorage := TDefaultStorage<TProjectModel>.Make();
   var LProjectModel: TProjectModel := nil;
@@ -134,19 +140,20 @@ begin
   //Create and sign the APK file
   if LAppService.BuildApk(LProjectModel, LEnvironmentModel) then begin
     //Install the APK on the device
-    LAppService.InstallApk(LProjectModel, LEnvironmentModel);
+    LAppService.InstallApk(LProjectModel, LEnvironmentModel, FDevices.Names[cbDevice.ItemIndex]);
 
     var LAdbService := TServiceSimpleFactory.CreateAdb();
     var LResult := TStringList.Create();
     try
-      LAdbService.RunApp(LEnvironmentModel.AdbLocation, LProjectModel.PackageName, LResult);
+      LAdbService.RunApp(LEnvironmentModel.AdbLocation, LProjectModel.PackageName,
+        FDevices.Names[cbDevice.ItemIndex], LResult);
     finally
       LResult.Free();
     end;
   end;
 end;
 
-procedure TMainForm.ListBoxItem3Click(Sender: TObject);
+procedure TMainForm.lbiProjectClick(Sender: TObject);
 begin
   var LForm := TFormSimpleFactory.CreateProject();
   try
@@ -158,33 +165,31 @@ end;
 
 procedure TMainForm.LoadDevices;
 begin
+  FDevices.Clear();
   cbDevice.Clear();
   aiDevice.Enabled := true;
   aiDevice.Visible := true;
   btnRefreshDevice.Enabled := false;
   TTask.Run(procedure begin
-    var LDevices := TStringList.Create();
+    var LStorage := TStorageSimpleFactory.CreateEnvironment();
     try
-      var LStorage := TStorageSimpleFactory.CreateEnvironment();
-      try
-        var LService := TServiceSimpleFactory.CreateAdb();
-        var LAdbPath := LStorage.GetAdbPath();
+      var LService := TServiceSimpleFactory.CreateAdb();
+      var LAdbPath := LStorage.GetAdbPath();
 
-        if not LAdbPath.IsEmpty() then
-          LService.ListDevices(LAdbPath, LDevices);
-      finally
-        TThread.Synchronize(nil, procedure begin
-          cbDevice.Items.Text := LDevices.Text;
-          if (cbDevice.Count > 0)  then
-            cbDevice.ItemIndex := 0;
-
-          aiDevice.Enabled := false;
-          aiDevice.Visible := false;
-          btnRefreshDevice.Enabled := true;
-        end);
-      end;
+      if not LAdbPath.IsEmpty() then
+        LService.ListDevices(LAdbPath, FDevices);
     finally
-      LDevices.Free();
+      TThread.Synchronize(nil, procedure begin
+        for var I := 0 to FDevices.Count - 1 do
+          cbDevice.Items.Add(FDevices.ValueFromIndex[I]);
+
+        if (cbDevice.Count > 0)  then
+          cbDevice.ItemIndex := 0;
+
+        aiDevice.Enabled := false;
+        aiDevice.Visible := false;
+        btnRefreshDevice.Enabled := true;
+      end);
     end;
   end);
 end;
