@@ -29,7 +29,8 @@ uses
   PythonVersion in 'source\PythonVersion.pas',
   Storage.Environment in 'source\storage\Storage.Environment.pas',
   Storage.Factory in 'source\storage\Storage.Factory.pas',
-  Services.Factory in 'source\services\Services.Factory.pas';
+  Services.Factory in 'source\services\Services.Factory.pas',
+  Frame.Loading in 'source\views\Frame.Loading.pas' {LoadingFrame: TFrame};
 
 {$R *.res}
 

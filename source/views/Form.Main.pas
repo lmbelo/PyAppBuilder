@@ -8,7 +8,7 @@ uses
   FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.Layouts, FMX.ListBox,
   FMX.StdCtrls, FMX.TabControl, System.Actions, FMX.ActnList, FMX.Ani,
   FMX.Objects, Form.Base, Services, Storage.Factory, Storage.Default,
-  Model.Project, Model.Environment, Model;
+  Model.Project, Model.Environment, Model, Frame.Loading;
 
 type
   TMainForm = class(TBaseForm, IServices, ILogServices)
@@ -33,6 +33,9 @@ type
     spLog: TSplitter;
     rrSpliterGrip: TRoundRect;
     mmLog: TMemo;
+    lbiBuild: TListBoxItem;
+    frmLoading: TLoadingFrame;
+    loMain: TLayout;
     procedure lbiEnvironmentClick(Sender: TObject);
     procedure lbiProjectClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -40,9 +43,15 @@ type
     procedure btnRefreshDeviceClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure lbiDeployClick(Sender: TObject);
+    procedure lbiBuildClick(Sender: TObject);
   private
     FDevices: TStrings;
+    FEnvironmentModel: TEnvironmentModel;
+    FProjectModel: TProjectModel;
     procedure LoadDevices();
+    procedure CheckSelectedDevice();
+    function LoadModels(const AValidate: boolean = true): boolean;
+    function BuildApk(): boolean;
   public
     procedure Log(const AString: string);
   end;
@@ -53,7 +62,7 @@ var
 implementation
 
 uses
-  System.Threading,
+  System.Threading, FMX.DialogService,
   Container.Images, Form.Factory, Form.Slider, Services.Factory, Services.ADB;
 
 {$R *.fmx}
@@ -61,6 +70,33 @@ uses
 procedure TMainForm.btnRefreshDeviceClick(Sender: TObject);
 begin
   LoadDevices();
+end;
+
+function TMainForm.BuildApk: boolean;
+begin
+  LoadModels(true);
+
+  var LAppService := TServiceSimpleFactory.CreateApp();
+  //Copy Python and other APP files
+  LAppService.CopyAppFiles(FProjectModel);
+  //Save the main.py script to the APP files
+  var LStream := TMemoryStream.Create();
+  try
+    mmEditor.Lines.SaveToStream(LStream);
+    LAppService.AddScriptFile(FProjectModel, 'main.py', LStream);
+  finally
+    LStream.Free();
+  end;
+  //Update the manifest with the custom APP settings
+  LAppService.UpdateManifest(FProjectModel);
+  //Create and sign the APK file
+  Result := LAppService.BuildApk(FProjectModel, FEnvironmentModel);
+end;
+
+procedure TMainForm.CheckSelectedDevice;
+begin
+  if cbDevice.ItemIndex < 0 then
+    raise Exception.Create('Select a device.');
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -90,69 +126,73 @@ begin
   end;
 end;
 
+procedure TMainForm.lbiBuildClick(Sender: TObject);
+begin
+  inherited;
+  mmLog.Lines.Clear();
+
+  frmLoading.Start();
+  TTask.Run(procedure begin
+    try
+      var LResult := BuildApk();
+      TThread.Synchronize(nil, procedure begin
+        frmLoading.Stop();
+        if LResult then
+          TDialogService.MessageDialog('Build process done.',
+            TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], TMsgDlgBtn.mbOK, -1, nil)
+        else
+          raise Exception.Create('Build process failed. Check log for details.');
+      end);
+    finally
+      TThread.Synchronize(nil, procedure begin
+        frmLoading.Stop();
+      end);
+    end;
+  end);
+end;
+
 procedure TMainForm.lbiDeployClick(Sender: TObject);
 begin
   inherited;
-  if cbDevice.ItemIndex < 0 then
-    raise Exception.Create('Select a device.');
-
+  CheckSelectedDevice();
   mmLog.Lines.Clear();
 
   var LAppService := TServiceSimpleFactory.CreateApp();
-  var LProjectStorage := TDefaultStorage<TProjectModel>.Make();
-  var LProjectModel: TProjectModel := nil;
-  var LEnvironmentStorage := TDefaultStorage<TEnvironmentModel>.Make();
-  var LEnvironmentModel: TEnvironmentModel := nil;
 
-  if not LEnvironmentStorage.LoadModel(LEnvironmentModel) then
-    raise Exception.Create('The Environment Settings are empty.');
-
-  if not LProjectStorage.LoadModel(LProjectModel) then
-    raise Exception.Create('The Project Settings are empty.');
-
-  var LModelErrors := TStringList.Create();
-  try
-    if not LEnvironmentModel.Validate(LModelErrors) then
-      raise EModelValidationError.Create('The Environment Settings has invalid arguments:'
-        + sLineBreak
-        + sLineBreak
-        + LModelErrors.Text);
-
-    if not LProjectModel.Validate(LModelErrors) then
-      raise EModelValidationError.Create('The Project Settings has invalid arguments:'
-        + sLineBreak
-        + sLineBreak
-        + LModelErrors.Text);
-  finally
-    LModelErrors.Free();
-  end;
-
-  //Copy Python and other APP files
-  LAppService.CopyAppFiles(LProjectModel);
-  //Save the main.py script to the APP files
-  var LStream := TMemoryStream.Create();
-  try
-    mmEditor.Lines.SaveToStream(LStream);
-    LAppService.AddScriptFile(LProjectModel, 'main.py', LStream);
-  finally
-    LStream.Free();
-  end;
-  //Update the manifest with the custom APP settings
-  LAppService.UpdateManifest(LProjectModel);
-  //Create and sign the APK file
-  if LAppService.BuildApk(LProjectModel, LEnvironmentModel) then begin
-    //Install the APK on the device
-    if LAppService.InstallApk(LProjectModel, LEnvironmentModel, FDevices.Names[cbDevice.ItemIndex]) then begin
-      var LAdbService := TServiceSimpleFactory.CreateAdb();
-      var LResult := TStringList.Create();
-      try
-        LAdbService.RunApp(LEnvironmentModel.AdbLocation, LProjectModel.PackageName,
-          FDevices.Names[cbDevice.ItemIndex], LResult);
-      finally
-        LResult.Free();
+  frmLoading.Start();
+  Application.ProcessMessages();
+  TTask.Run(procedure begin
+    try
+      //Create and sign the APK file
+      if BuildApk() then begin
+        //Install the APK on the device
+        if LAppService.InstallApk(FProjectModel, FEnvironmentModel, FDevices.Names[cbDevice.ItemIndex]) then begin
+          var LAdbService := TServiceSimpleFactory.CreateAdb();
+          var LResult := TStringList.Create();
+          try
+            LAdbService.RunApp(FEnvironmentModel.AdbLocation, FProjectModel.PackageName,
+              FDevices.Names[cbDevice.ItemIndex], LResult);
+          finally
+            LResult.Free();
+          end;
+        end else begin
+          TThread.Synchronize(nil, procedure begin
+            frmLoading.Stop();
+            raise Exception.Create('Install process failed. Check log for details.');
+          end);
+        end;
+      end else begin
+        TThread.Synchronize(nil, procedure begin
+          frmLoading.Stop();
+          raise Exception.Create('Build process failed. Check log for details.');
+        end);
       end;
+    finally
+      TThread.Synchronize(nil, procedure begin
+        frmLoading.Stop();
+      end);
     end;
-  end;
+  end);
 end;
 
 procedure TMainForm.lbiProjectClick(Sender: TObject);
@@ -194,6 +234,46 @@ begin
       end);
     end;
   end);
+end;
+
+function TMainForm.LoadModels(const AValidate: boolean): boolean;
+begin
+  var LProjectStorage := TDefaultStorage<TProjectModel>.Make();
+  var LEnvironmentStorage := TDefaultStorage<TEnvironmentModel>.Make();
+
+  if not LEnvironmentStorage.LoadModel(FEnvironmentModel) then
+    if AValidate then
+      raise Exception.Create('The Environment Settings are empty.')
+    else
+      Exit(false);
+
+  if not LProjectStorage.LoadModel(FProjectModel) then
+    if AValidate then
+      raise Exception.Create('The Project Settings are empty.')
+    else
+      Exit(false);
+
+  if not AValidate then
+    Exit(true);
+
+  var LModelErrors := TStringList.Create();
+  try
+    if not FEnvironmentModel.Validate(LModelErrors) then
+      raise EModelValidationError.Create('The Environment Settings has invalid arguments:'
+        + sLineBreak
+        + sLineBreak
+        + LModelErrors.Text);
+
+    if not FProjectModel.Validate(LModelErrors) then
+      raise EModelValidationError.Create('The Project Settings has invalid arguments:'
+        + sLineBreak
+        + sLineBreak
+        + LModelErrors.Text);
+  finally
+    LModelErrors.Free();
+  end;
+
+  Result := true;
 end;
 
 procedure TMainForm.Log(const AString: string);
