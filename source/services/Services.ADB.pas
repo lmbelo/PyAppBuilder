@@ -40,7 +40,7 @@ function TADBService.BuildApk(const AAppBasePath, AAppName: string;
 const
   CMD_1 = '$AAPT package -f -m -J . -M AndroidManifest.xml -S res -I $ANDROIDJAR';
 
-  CMD_2 = '$AAPT package -f -m -F bin\$APPNAME.unaligned.apk -M \AndroidManifest.xml -S res -I $ANDROIDJAR ';
+  CMD_2 = '$AAPT package -f -m -F bin\$APPNAME.unaligned.apk -M AndroidManifest.xml -S res -I $ANDROIDJAR ';
 
   CMD_3 = 'xcopy $APPBASEPATH\classes\classes.dex $APPBASEPATH\bin\ /y';
 
@@ -162,9 +162,7 @@ begin
         Exit;
 
       var LDevice := Copy(ADeviceList[I], 1, LPos - 1);
-      var LValue: extended;
-      if TryStrToFloat(LDevice, LValue) then
-        AProc(LDevice);
+      AProc(LDevice);
     end;
   end;
 end;

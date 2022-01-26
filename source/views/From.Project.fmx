@@ -26,7 +26,7 @@ inherited ProjectForm: TProjectForm
         Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'listboxplainheader'
-        TabOrder = 0
+        TabOrder = 6
         Text = 'Application Name:'
       end
       object ListBoxItem6: TListBoxItem
@@ -34,12 +34,12 @@ inherited ProjectForm: TProjectForm
         Size.Width = 402.000000000000000000
         Size.Height = 38.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 5
+        TabOrder = 0
         object edtAppName: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           Align = Client
           StyleLookup = 'editstyle'
-          TabOrder = 40
+          TabOrder = 0
           Margins.Left = 5.000000000000000000
           Margins.Top = 5.000000000000000000
           Margins.Right = 5.000000000000000000
@@ -59,7 +59,7 @@ inherited ProjectForm: TProjectForm
         Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'listboxplainheader'
-        TabOrder = 1
+        TabOrder = 7
         Text = 'Package Settings'
       end
       object ListBoxItem1: TListBoxItem
@@ -67,12 +67,12 @@ inherited ProjectForm: TProjectForm
         Size.Width = 402.000000000000000000
         Size.Height = 60.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 7
+        TabOrder = 1
         object edtPackageName: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           Align = Client
           StyleLookup = 'editstyle'
-          TabOrder = 40
+          TabOrder = 1
           Margins.Left = 5.000000000000000000
           Margins.Top = 5.000000000000000000
           Margins.Right = 5.000000000000000000
@@ -93,7 +93,7 @@ inherited ProjectForm: TProjectForm
           Size.Height = 17.000000000000000000
           Size.PlatformDefault = False
           Text = 'Package Name:'
-          TabOrder = 41
+          TabOrder = 40
         end
       end
       object ListBoxGroupHeader2: TListBoxGroupHeader
@@ -112,12 +112,12 @@ inherited ProjectForm: TProjectForm
         Size.Width = 402.000000000000000000
         Size.Height = 60.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 6
+        TabOrder = 2
         object edtVersionCode: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           Align = Client
           StyleLookup = 'editstyle'
-          TabOrder = 40
+          TabOrder = 2
           Margins.Left = 5.000000000000000000
           Margins.Top = 5.000000000000000000
           Margins.Right = 5.000000000000000000
@@ -138,7 +138,7 @@ inherited ProjectForm: TProjectForm
           Size.Height = 17.000000000000000000
           Size.PlatformDefault = False
           Text = 'Version Code:'
-          TabOrder = 41
+          TabOrder = 40
         end
       end
       object ListBoxItem3: TListBoxItem
@@ -146,12 +146,12 @@ inherited ProjectForm: TProjectForm
         Size.Width = 402.000000000000000000
         Size.Height = 60.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 4
+        TabOrder = 3
         object edtVersionName: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           Align = Client
           StyleLookup = 'editstyle'
-          TabOrder = 40
+          TabOrder = 3
           Margins.Left = 5.000000000000000000
           Margins.Top = 5.000000000000000000
           Margins.Right = 5.000000000000000000
@@ -172,7 +172,7 @@ inherited ProjectForm: TProjectForm
           Size.Height = 17.000000000000000000
           Size.PlatformDefault = False
           Text = 'Version Name:'
-          TabOrder = 41
+          TabOrder = 40
         end
       end
       object ListBoxGroupHeader3: TListBoxGroupHeader
@@ -191,7 +191,7 @@ inherited ProjectForm: TProjectForm
         Size.Width = 402.000000000000000000
         Size.Height = 60.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 3
+        TabOrder = 4
         object cbPythonVersion: TComboBox
           Align = Client
           Items.Strings = (
@@ -206,7 +206,7 @@ inherited ProjectForm: TProjectForm
           Size.Width = 392.000000000000000000
           Size.Height = 28.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 52
+          TabOrder = 4
         end
         object lblPythonVersion: TLabel
           Align = Top
@@ -219,7 +219,7 @@ inherited ProjectForm: TProjectForm
           Size.Height = 17.000000000000000000
           Size.PlatformDefault = False
           Text = 'Python Version:'
-          TabOrder = 41
+          TabOrder = 40
         end
       end
       object ListBoxGroupHeader4: TListBoxGroupHeader
@@ -237,7 +237,7 @@ inherited ProjectForm: TProjectForm
         Size.Width = 402.000000000000000000
         Size.Height = 38.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 2
+        TabOrder = 5
         object cbArchitecture: TComboBox
           Align = Client
           Items.Strings = (
@@ -251,7 +251,7 @@ inherited ProjectForm: TProjectForm
           Size.Width = 392.000000000000000000
           Size.Height = 28.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 52
+          TabOrder = 5
         end
       end
     end
@@ -259,6 +259,14 @@ inherited ProjectForm: TProjectForm
   inherited loFooter: TLayout
     Position.Y = 492.000000000000000000
     Size.Width = 406.000000000000000000
+    inherited loLeftActions: TLayout
+      inherited btnSave: TButton
+        TabOrder = 0
+      end
+      inherited btnCancel: TButton
+        TabOrder = 1
+      end
+    end
   end
   inherited loHeader: TLayout
     Size.Width = 406.000000000000000000

@@ -163,8 +163,8 @@ inherited MainForm: TMainForm
         DefaultItemStyles.ItemStyle = 'listboxitemnodetail'
         DefaultItemStyles.GroupHeaderStyle = 'listboxgroupheader'
         DefaultItemStyles.GroupFooterStyle = ''
-        Viewport.Width = 50.000000000000000000
-        Viewport.Height = 691.000000000000000000
+        Viewport.Width = 54.000000000000000000
+        Viewport.Height = 695.000000000000000000
         object ListBoxGroupHeader1: TListBoxGroupHeader
           TextSettings.HorzAlign = Center
           StyledSettings = [Family, Size, Style, FontColor]
